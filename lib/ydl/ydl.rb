@@ -7,8 +7,12 @@ module Ydl
   class << self
     # Configuration hash for Ydl, read from ~/.ydl/config.yaml on require.
     attr_accessor :config
+
+    # Holder of all the data read from the .ydl files as a Hash
+    attr_accessor :data
   end
   self.config = {}
+  self.data = {}
 
   # Load all .ydl files.
   # Load all .ydl files, subject to the given options.  After loading, the data
