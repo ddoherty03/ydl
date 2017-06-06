@@ -97,7 +97,7 @@ If no class is found, the item is left as a Hash.
 
 *** Cross References
 
-String values can have the form ~'ydl:/person/smith/address/city'~, that is, the
+String values can have the form ~ydl:/person/smith/address/city~, that is, the
 'ydl:' specifier followed by a "data path", much like a file name path, will,
 upon resolution, look up the value of the given item and return it as the value
 of that element.  Resolution of ~ydl:~ elements is deferred until all files have
@@ -118,4 +118,4 @@ git commits and tags, and push the ~.gem~ file to
 ** Contributing
 
 Bug reports and pull requests are welcome on GitHub at
-https://github.com/ddoherty03/erb_ddl.
+https://github.com/ddoherty03/ydl.
