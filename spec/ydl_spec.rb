@@ -1,11 +1,15 @@
-require "spec_helper"
+require 'spec_helper'
 
 RSpec.describe Ydl do
-  it "has a version number" do
+  it 'has a version number' do
     expect(Ydl::VERSION).not_to be nil
   end
 
-  it "does something useful" do
-    expect(false).to eq(true)
+  describe 'ydl_files' do
+    it 'finds all ydl files' do
+      ydls = Ydl.ydl_files
+      expect(ydls.size).to be > 5
+      expect(ydls.last).to match(/subproject/)
+    end
   end
 end
