@@ -47,8 +47,8 @@ module Ydl
 
     # Find directories from pwd to home, then reverse
     dir_list = []
-    dir = __dir__
-    while dir != File.expand_path("~/..")
+    dir = Dir.pwd
+    while dir != File.expand_path('~/..')
       dir_list << dir
       dir = Pathname.new(dir).parent.to_s
     end
