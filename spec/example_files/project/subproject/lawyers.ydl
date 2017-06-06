@@ -1,0 +1,85 @@
+# This is a comment
+ded:
+  address:
+    street:
+      - Commerce Plaza I
+      - 7300 W. 110th Street, Suite 930
+  phone: 913-488-3342
+  bar_numbers:
+    NY: "DD-2145"
+
+rjones:
+  sex: male
+  last: Jones
+  first: Robert
+  middle: G.
+  address:
+    street:
+      - Ropes & Gray LLP
+      - 800 Boylston Street
+    city: Boston
+    state: MA
+    zip: "02199"
+  phone: 617-951-7000
+  fax: 617-951-7050
+  email: robert.jones@ropesgray.com
+
+mcrisp:
+  sex: male
+  last: Crisp
+  first: Martin
+  middle: J.
+  address:
+    street:
+      - Ropes & Gray LLP
+      - 1211 Avenue of the Americas
+    city: New York
+    state: NY
+    zip: "10036-8704"
+  phone: 212-596-9000
+  fax: 212-596-9090
+  email: martin.crisp@ropesgray.com
+
+tfarrell:
+  sex: male
+  last: Farrell
+  first: Timothy
+  middle: R.
+  address:
+    street:
+      - Ropes & Gray LLP
+      - 191 North Wacker Drive, 32nd Floor
+    city: Chicago
+    state: IL
+    zip: "60606"
+  phone: 312-845-1209
+  fax: 312-845-5569
+  email: Timothy.Farrell@ropesgray.com
+
+dclarke:
+  sex: male
+  last: Clarke
+  first: David
+  address:
+    street:
+      - DLA Piper LLP (US)
+      - 1251 Avenue of the Americas
+    city: New York
+    state: NY
+    zip: "10020"
+  phone: 212-335-4500
+  email: john.clarke@dlapiper.com
+
+jclarke:
+  sex: male
+  last: Clarke
+  first: David
+  address:
+    street:
+      - DLA Piper LLP (US)
+      - 500 Eighth Street NW
+    city: Washington
+    state: DC
+    zip: "20004"
+  phone: 202-799-4000
+  email: david.clarke@dlapiper.com

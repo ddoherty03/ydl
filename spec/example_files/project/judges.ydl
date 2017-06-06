@@ -1,0 +1,15 @@
+kbf:
+  sex: female
+  honorific: Hon.
+  first: Katherine
+  middle: B.
+  last: Forrest
+  initials: KBF
+  title: District Court Judge
+  address:
+    street:
+      - United States Courthouse
+      - 500 Pearle Street, Room 1320
+    city: New York
+    state: NY
+    zip: '10007-1320'

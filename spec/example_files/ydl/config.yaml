@@ -1,0 +1,36 @@
+# You can set the system-wide ydl directory here; otherwise it defaults to
+# /usr/local/share/ydl.
+
+# system_ydl_dir: /usr/local/share/ydl
+
+# For automatic instantiation, search for classes prefixed by the given modules
+# in the order given. For example, if the key 'breed' is to be instantiated, you
+# can restrict the search for classes named 'Breed' only in modules, 'Dog' and
+# 'Cat' with this:
+#
+#   prefix_classes:
+#     - Dog
+#     - Cat
+#
+# then, only Dog::Breed and Cat::Breed will be searched for an existing breed
+# class. Otherwise, any class ending in Breed could be used, and they will be
+# searched in alphabetical order, and the first found will be used.
+
+prefix_classes:
+  - Legal
+  - Company::Employee
+
+# By default, each key will be camelized and singularized to find the matching
+# class. So, the key 'dogs' will look for a class named 'Dog', and 'dog_faces'
+# will look for a class 'DogFace'. You can override this heuristic here by
+# saying exactly which class a given key should map to.
+
+class_map:
+  people: Legal::Person
+  persons: Legal::Person
+
+# Specify constructors for classes whose .new method will not take a Hash as an
+# argument to initialize the class.
+
+class_init:
+  Legal::Person: from_hash

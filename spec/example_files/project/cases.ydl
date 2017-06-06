@@ -1,0 +1,41 @@
+erickson:
+  number: 14-CV-09061
+  complaint_date: 2014-11-17
+  court: ydl:/courts/sdny
+  judge: ydl:/judges/kbf
+  plaintiffs:
+    - ydl:/person/mdg
+    - ydl:/person/mdg
+  defendants:
+    - ydl:/person/morgan
+    - ydl:/person/zmpef1
+    - ydl:/person/zmpef2
+    - ydl:/person/zmeac
+  parties:
+    -
+      person: ydl:/persons/morgan
+      role: Defendant
+      lawyers:
+        - ydl:/lawyers/rjones
+        - ydl:/lawyers/mcrisp
+        - ydl:/lawyers/tfarrell
+    -
+      person: ydl:/persons/zmpef1
+      role: Defendant
+      lawyers:
+        - ydl:/lawyers/rjones
+        - ydl:/lawyers/mcrisp
+        - ydl:/lawyers/tfarrell
+    -
+      person: ydl:/persons/zmpef2
+      role: Defendant
+      lawyers:
+        - ydl:/lawyers/rjones
+        - ydl:/lawyers/mcrisp
+        - ydl:/lawyers/tfarrell
+    -
+      person: ydl:/persons/erickson
+      role: Nominal Defendant
+      lawyers:
+        - ydl:/lawyers/dclarke
+        - ydl:/lawyers/jclarke
