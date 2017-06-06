@@ -31,12 +31,22 @@ module Ydl
   # @param [Hash] options selectively ignore files; use alternative config
   # @return [Hash] data read from .ydl files as a Hash
   def self.load_all(**options)
-    binding.pry
+    # Apply special config, if any
+    if options[:config]
+      read_config(options[:config].to_s)
+    end
+
     # Load each file in order to self.data
     file_names = ydl_files(options)
     file_names.each do |fn|
       Ydl.load_file(fn, options)
     end
+
+    # Revert special config to default
+    if options[:config]
+      read_config
+    end
+    data
   end
 
   def self.load_file(name, **options)
@@ -64,9 +74,12 @@ module Ydl
     file_names
   end
 
-  def self.read_config
-    cfg_file = File.expand_path(CONFIG_FILE)
+  def self.read_config(cfg_file = nil)
+    cfg_file = File.expand_path(cfg_file) if cfg_file
+    cfg_file ||= File.expand_path(CONFIG_FILE)
     Ydl.config = YAML.load_file(cfg_file) if File.exist?(cfg_file)
+    Ydl.config['system_ydl_dir'] ||= SYSTEM_DIR
+    Ydl.config
   end
 
   read_config
