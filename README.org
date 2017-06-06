@@ -10,7 +10,7 @@ and containing the data in YAML format.
 Add this line to your application's Gemfile:
 
 #+BEGIN_SRC ruby
-gem 'erb_ddl'
+gem 'ydl'
 #+END_SRC
 
 And then execute:
@@ -22,7 +22,7 @@ And then execute:
 Or install it yourself as:
 
 #+BEGIN_SRC shell
-  $ gem install erb_ddl
+  $ gem install ydl
 #+END_SRC
 
 ** Usage
