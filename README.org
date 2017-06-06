@@ -1,0 +1,121 @@
+* Ydl
+
+Ydl is meant to provide a way of supplying a ruby app with a set of initialized
+data structures for use in an application by allowing the user to supply
+persistent data in a series of "data definition files" with the extension ~.ydl~
+and containing the data in YAML format.
+
+** Installation
+
+Add this line to your application's Gemfile:
+
+#+BEGIN_SRC ruby
+gem 'erb_ddl'
+#+END_SRC
+
+And then execute:
+
+#+BEGIN_SRC shell
+  $ bundle
+#+END_SRC
+
+Or install it yourself as:
+
+#+BEGIN_SRC shell
+  $ gem install erb_ddl
+#+END_SRC
+
+** Usage
+
+Ydl allows you to build a Hash containing all the items defined in the data
+definition files:
+
+#+BEGIN_SRC ruby
+  require 'ydl'
+
+  data = Ydl.load_all
+  data.class     #=> Hash
+  data[:persons] #=> { ded: {....}, tyh: {....} }
+#+END_SRC
+
+You can load only files with a given base name:
+
+#+BEGIN_SRC ruby
+  require 'ydl'
+
+  people = Ydl.load('person')
+  people.class        #=> Hash
+  people              #=> { ded: {....}, tyh: {....} }
+  people[:ded].class  #=> Person
+#+END_SRC
+
+*** Data Definition Files
+
+The data definition files have the extension ~.ydl~ and can occur in the
+following places:
+
+- in a system wide directory that is by default, ~/etc/ydl~, including all its
+  subdirectories,
+- in a user-specific directory in the user's HOME directory that is by default,
+  =~/ydl=, including all its subdirectories,
+- in the current working directory and all directories above the current
+  directory up to the user's home directory
+
+The data definitions are read in the same order as given above, except that the
+third category reads files in the HOME directory first, then in each directory
+from there to the current directory in order.  In other words, directories
+closer to the current directory take priority over those higher up in the
+directory hierarchy.
+
+In each case, all files with the extension '.ydl' are read and /only/ those files.
+Definitions in files read later are merged into those read earlier, overwriting
+any data having the same key or appending to array data having the same key.
+
+The base name of each file is used as an outer key for the contents of the file.
+For example, a file ~'person.ydl'~ in the current directory will be treated as
+the value of a Hash with the key 'person'.
+
+*** Automatic Instantiation of Classes
+
+If, at the time the files are read in, there is a class whose name is the
+camelized and singularized version of a hash key, and if the value of that key
+is itself a hash, an instance of the class is initialized using the hash values
+as initializers. So if there is a class defined whose last component is Person,
+the contents of the file ~'person.ydl'~ will instantiate objects of that class.
+This process is recursive, so values that are hashes with keys matching class
+names are instantiated as well. If there is more than one such class, an
+exception is raised. You can restrict the classes searched for by setting the
+~class_prefix~ config setting to a string or a list of strings of class prefixes
+to be consulted. If ~class_prefix~ is set to 'Company::Engineers', only the
+class ~Company::Engineers::Person~ will be instantiated.
+
+In order for this to work, the initialize method for the classes must be able to
+take a Hash as an argument to ~.new~.  A different initializer method can be
+specified for each class in the configuration file.
+
+If no class is found, the item is left as a Hash.
+
+*** Cross References
+
+String values can have the form ~'ydl:/person/smith/address/city'~, that is, the
+'ydl:' specifier followed by a "data path", much like a file name path, will,
+upon resolution, look up the value of the given item and return it as the value
+of that element.  Resolution of ~ydl:~ elements is deferred until all files have
+been read in so that forward references are possible.
+
+** Development
+
+After checking out the repo, run ~bin/setup~ to install dependencies. Then, run
+~rake spec~ to run the tests. You can also run ~bin/console~ for an interactive
+prompt that will allow you to experiment.
+
+To install this gem onto your local machine, run ~bundle exec rake install~. To
+release a new version, update the version number in ~version.rb~, and then run
+~bundle exec rake release~, which will create a git tag for the version, push
+git commits and tags, and push the ~.gem~ file to
+[rubygems.org](https://rubygems.org).
+
+** Contributing
+
+Bug reports and pull requests are welcome on GitHub at
+https://github.com/ddoherty03/erb_ddl.
