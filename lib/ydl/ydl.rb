@@ -11,6 +11,22 @@ module Ydl
   self.config = {}
 
   # Load all .ydl files.
+  # Load all .ydl files, subject to the given options.  After loading, the data
+  # in the .ydl files will be available in Ydl.data and accessible with Ydl[].
+  #
+  # The following options affect which files are loaded:
+  #
+  # - ignore: String :: ignore all .ydl files whose base name matches the given
+  #   string.
+  # - ignore: /regexp/ :: ignore all .ydl files whose base name matches the
+  #   given regexp.
+  # - ignore: [String|/regexp/] :: ignore all .ydl files whose base name matches any of
+  #   the given strings or regexp's.
+  # - config: String :: use the config file given in the pathname String instead
+  #   of the default in ~/.ydl/config.yaml.
+  #
+  # @param [Hash] options selectively ignore files; use alternative config
+  # @return [Hash] data read from .ydl files as a Hash
   def self.load_all(**options)
     binding.pry
     # Load each file in order
