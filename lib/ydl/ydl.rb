@@ -14,7 +14,6 @@ module Ydl
   self.config = {}
   self.data = {}
 
-  # Load all .ydl files.
   # Load all .ydl files, subject to the given options.  After loading, the data
   # in the .ydl files will be available in Ydl.data and accessible with Ydl[].
   #
@@ -33,8 +32,8 @@ module Ydl
   # @return [Hash] data read from .ydl files as a Hash
   def self.load_all(**options)
     binding.pry
-    # Load each file in order
-    file_names = find_dd_files(options)
+    # Load each file in order to self.data
+    file_names = ydl_files(options)
     file_names.each do |fn|
       Ydl.load_file(fn, options)
     end
@@ -44,7 +43,7 @@ module Ydl
     puts name
   end
 
-  def self.find_dd_files(**options)
+  def self.ydl_files(**options)
     file_names = []
     file_names += Dir.glob("#{Ydl.config['system_ydl_dir']}/**/*.ydl")
     file_names += Dir.glob(File.join(ENV['HOME'], '.ydl/**/*.ydl'))
