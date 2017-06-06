@@ -1,8 +1,8 @@
 require 'ydl'
 
 module Ydl
-  SYSTEM_DIR = '/etc/ydl'
-  CONFIG_FILE = '~/.ydl/config.yaml'
+  SYSTEM_DIR = '/usr/local/share/ydl'.freeze
+  CONFIG_FILE = '~/.ydl/config.yaml'.freeze
 
   class << self
     # Configuration hash for Ydl, read from ~/.ydl/config.yaml on require.
@@ -42,8 +42,8 @@ module Ydl
 
   def self.find_dd_files(**options)
     file_names = []
-    file_names += Dir.glob("#{SYSTEM_DIR}/**/*.ydl")
-    file_names += Dir.glob(File.join("#{ENV['HOME']}", ".ydl/**/*.ydl"))
+    file_names += Dir.glob("#{Ydl.config['system_ydl_dir']}/**/*.ydl")
+    file_names += Dir.glob(File.join(ENV['HOME'], '.ydl/**/*.ydl'))
 
     # Find directories from pwd to home, then reverse
     dir_list = []
