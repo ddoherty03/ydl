@@ -41,7 +41,6 @@ module Ydl
     file_names.each do |fn|
       self.data = data.deep_merge(Ydl.load_file(fn, options))
     end
-    data.deep_symbolize_keys!
 
     # Revert special config to default config
     read_config if options[:config]
@@ -54,6 +53,7 @@ module Ydl
     key = File.basename(name, '.ydl')
     result = {}
     result[key] = YAML.load_file(name)
+    result[key].deep_symbolize_keys! if result[key].is_a?(Hash)
     result
   end
 
