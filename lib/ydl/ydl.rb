@@ -57,6 +57,10 @@ module Ydl
     result
   end
 
+  def self.[](key)
+    Ydl.data[key]
+  end
+
   def self.ydl_files(ignore: nil)
     file_names = []
     file_names += Dir.glob("#{Ydl.config['system_ydl_dir']}/**/*.ydl")
