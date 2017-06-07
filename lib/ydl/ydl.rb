@@ -76,8 +76,8 @@ module Ydl
     dir_list = dir_list.reverse
 
     # Gather the .ydl files in those directories
-    dir_list.each do |dir|
-      file_names += Dir.glob("#{dir}/*.ydl")
+    dir_list.each do |d|
+      file_names += Dir.glob("#{d}/*.ydl")
     end
 
     # Filter out any files whose base name matches options[:ignore]
