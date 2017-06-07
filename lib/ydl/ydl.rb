@@ -34,9 +34,7 @@ module Ydl
   # @return [Hash] data read from .ydl files as a Hash
   def self.load_all(**options)
     # Apply special config, if any
-    if options[:config]
-      read_config(options[:config].to_s)
-    end
+    read_config(options[:config].to_s) if options[:config]
 
     # Load each file in order to self.data
     file_names = ydl_files(options)
@@ -45,10 +43,8 @@ module Ydl
     end
     data.deep_symbolize_keys!
 
-    # Revert special config to default
-    if options[:config]
-      read_config
-    end
+    # Revert special config to default config
+    read_config if options[:config]
     data
   end
 
