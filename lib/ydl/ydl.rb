@@ -1,4 +1,6 @@
 require 'ydl'
+require 'active_support/core_ext/hash/deep_merge'
+require 'active_support/core_ext/hash/keys'
 
 module Ydl
   SYSTEM_DIR = '/usr/local/share/ydl'.freeze
@@ -39,8 +41,9 @@ module Ydl
     # Load each file in order to self.data
     file_names = ydl_files(options)
     file_names.each do |fn|
-      Ydl.load_file(fn, options)
+      self.data = data.deep_merge(Ydl.load_file(fn, options))
     end
+    data.deep_symbolize_keys!
 
     # Revert special config to default
     if options[:config]
@@ -49,8 +52,13 @@ module Ydl
     data
   end
 
+  # Return a Hash with a single key of the basename of the given file and a
+  # value equal to the result of reading in the given YAML file.
   def self.load_file(name, **options)
-    puts name
+    key = File.basename(name, '.ydl')
+    result = {}
+    result[key] = YAML.load_file(name)
+    result
   end
 
   def self.ydl_files(**options)
