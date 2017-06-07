@@ -40,5 +40,21 @@ RSpec.describe Ydl do
       expect((all_ydls - some_ydls).all? { |n| n =~ /lawyer|court/ }).to be true
     end
   end
+
+  describe 'load_all' do
+    before :all do
+      @hsh = Ydl.load_all
+    end
+
+    it 'should return a merged Hash keyed by symbols' do
+      expect(@hsh.class).to eq(Hash)
+      expect(Ydl.data.class).to eq(Hash)
+      expect(Ydl.data[:lawyers][:ded].class).to eq(Hash)
+      expect(Ydl.data.keys.sort).to eq([:cases, :courts, :judges, :lawyers, :persons])
+    end
+
+    it 'should allow access through []' do
+      expect(Ydl[:lawyers].class).to eq(Hash)
+    end
   end
 end
