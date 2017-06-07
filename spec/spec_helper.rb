@@ -10,36 +10,40 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
-  ydl_dir = File.expand_path('~/.ydl')
-  config_yaml = File.join(ydl_dir, 'config.yaml')
-  config_yaml_template = File.join(__dir__, 'example_files', 'ydl', 'config.yaml')
-  keep_ydl_dir = false
-  keep_config_yaml = false
-  spec_cwd = File.join(__dir__, '../tmp/project/subproject')
-  spec_cwd_parent = File.join(__dir__, '../tmp')
-  spec_template_parent = File.join(__dir__, 'example_files', 'project')
+  # The following sets up a mock-up of a file system to use for testing under
+  # the project's tmp directory.  It modifies the configuration file there to
+  # include a system ydl directory as well.
+  spec_sys_dir = File.join(__dir__, 'example_files', 'sys')
+  spec_home_dir = File.join(__dir__, 'example_files', 'home')
+  tmp_dir = File.expand_path(File.join(__dir__, '../tmp'))
+  tmp_home = File.join(tmp_dir, 'home')
+  tmp_user_home = File.join(tmp_dir, 'home', 'user')
+  tmp_sys = File.join(tmp_dir, 'sys')
+  tmp_sys_ydl_dir = File.join(tmp_dir, 'sys', 'ydl')
+  tmp_project_dir = File.join(tmp_user_home, 'project', 'subproject')
   begin_cwd = Dir.pwd
+  begin_home = ENV['HOME']
 
   config.before(:suite) do
-    if Dir.exist?(ydl_dir)
-      keep_ydl_dir = true
-    else
-      FileUtils.mkdir_p(ydl_dir)
+    FileUtils.cp_r(spec_sys_dir, tmp_dir)
+    FileUtils.cp_r(spec_home_dir, tmp_dir)
+    cfg_file = File.join(tmp_user_home, '.ydl', 'config.yaml')
+    File.open(cfg_file, 'a') do |f|
+      cfg_line = <<-EOS
+
+system_ydl_dir: #{tmp_sys_ydl_dir}
+
+      EOS
+      f.write(cfg_line)
     end
-    if File.exist?(config_yaml)
-      keep_config_yaml = true
-    else
-      FileUtils.cp(config_yaml_template, ydl_dir)
-    end
-    FileUtils.mkdir_p(spec_cwd) unless Dir.exist?(spec_cwd)
-    FileUtils.cp_r(spec_template_parent, spec_cwd_parent)
-    Dir.chdir(spec_cwd)
+    ENV['HOME'] = tmp_user_home
+    Dir.chdir(tmp_project_dir)
   end
 
   config.after(:suite) do
-    FileUtils.rm_f(config_yaml) unless keep_config_yaml
-    FileUtils.rm_rf(ydl_dir) unless keep_ydl_dir
-    FileUtils.rm_rf(spec_cwd_parent)
+    FileUtils.rm_rf(tmp_home)
+    FileUtils.rm_rf(tmp_sys)
+    ENV['HOME'] = begin_home
     Dir.chdir(begin_cwd)
   end
 end
