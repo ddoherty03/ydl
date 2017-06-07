@@ -71,7 +71,28 @@ module Ydl
     dir_list.each do |dir|
       file_names += Dir.glob("#{dir}/*.ydl")
     end
+
+    # Filter out any files whose base name matches options[:ignore]
+    unless options[:ignore].blank?
+      file_names = filter_ignores(file_names, options[:ignore])
+    end
     file_names
+  end
+
+  def self.filter_ignores(names, ignores)
+    ignores = [ignores] unless ignores.is_a?(Array)
+    return names if ignores.empty?
+    result = names
+    ignores.each do |ign|
+      names.each do |nm|
+        base = File.basename(nm, '.ydl')
+        match = false
+        match ||= ign.match(base) if ign.is_a?(Regexp)
+        match ||= (ign == base) if ign.is_a?(String)
+        result.delete(nm) if match
+      end
+    end
+    result
   end
 
   def self.read_config(cfg_file = nil)
