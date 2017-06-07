@@ -32,32 +32,32 @@ module Ydl
   #
   # @param [Hash] options selectively ignore files; use alternative config
   # @return [Hash] data read from .ydl files as a Hash
-  def self.load_all(**options)
+  def self.load_all(resolve: true, config: nil, ignore: nil)
     # Apply special config, if any
-    read_config(options[:config].to_s) if options[:config]
+    read_config(config.to_s) if config
 
     # Load each file in order to self.data
-    file_names = ydl_files(options)
+    file_names = ydl_files(ignore: ignore)
     file_names.each do |fn|
-      self.data = data.deep_merge(Ydl.load_file(fn, options))
+      self.data = data.deep_merge(Ydl.load_file(fn))
     end
 
     # Revert special config to default config
-    read_config if options[:config]
+    read_config if config
     data
   end
 
   # Return a Hash with a single key of the basename of the given file and a
   # value equal to the result of reading in the given YAML file.
-  def self.load_file(name, **options)
-    key = File.basename(name, '.ydl')
+  def self.load_file(name)
+    key = File.basename(name, '.ydl').to_sym
     result = {}
     result[key] = YAML.load_file(name)
     result[key].deep_symbolize_keys! if result[key].is_a?(Hash)
     result
   end
 
-  def self.ydl_files(**options)
+  def self.ydl_files(ignore: nil)
     file_names = []
     file_names += Dir.glob("#{Ydl.config['system_ydl_dir']}/**/*.ydl")
     file_names += Dir.glob(File.join(ENV['HOME'], '.ydl/**/*.ydl'))
@@ -77,9 +77,7 @@ module Ydl
     end
 
     # Filter out any files whose base name matches options[:ignore]
-    unless options[:ignore].blank?
-      file_names = filter_ignores(file_names, options[:ignore])
-    end
+    file_names = filter_ignores(file_names, ignore) unless ignore.blank?
     file_names
   end
 
