@@ -76,10 +76,10 @@ module Ydl
     file_names += Dir.glob("#{Ydl.config['system_ydl_dir']}/**/*.ydl")
     file_names += Dir.glob(File.join(ENV['HOME'], '.ydl/**/*.ydl'))
 
-    # Find directories from pwd to home, then reverse
+    # Find directories from pwd to home (or root), then reverse
     dir_list = []
     dir = Dir.pwd
-    while dir != File.expand_path('~/..')
+    while dir != File.expand_path('~/..') && dir != '/'
       dir_list << dir
       dir = Pathname.new(dir).parent.to_s
     end
