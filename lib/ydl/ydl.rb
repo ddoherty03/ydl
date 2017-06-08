@@ -45,6 +45,8 @@ module Ydl
       self.data = data.deep_merge(Ydl.load_file(fn))
     end
 
+    resolve_xref(data) if resolve
+
     # Revert special config to default config
     read_config if config
     data
@@ -117,6 +119,59 @@ module Ydl
     cfg_file = File.expand_path(cfg_file) if cfg_file
     cfg_file ||= File.expand_path(CONFIG_FILE)
     Ydl.config = YAML.load_file(cfg_file) if File.exist?(cfg_file)
+  # Convert all the cross-references of the form ydl:/path/to/other/entry to the
+  # contents of that other entry by dup-ing the other entry into the Hash tree
+  # where the cross-reference appeared.  This modifies Ydl.data in place.
+  def self.resolve_xref(tree, path_to_here: [])
+    root_path = path_to_here.dup
+    case tree
+    when Hash
+      tree.each_pair do |key, val|
+        resolve_xref(val, path_to_here: root_path + [key])
+      end
+    when Array
+      tree.each_with_index do |val, k|
+        resolve_xref(val, path_to_here: root_path + [k])
+      end
+    when String
+      match = tree.clean.match(%r{\Aydl:/(?<path_str>.*)\z})
+      #binding.pry if tree =~ /zmeac/
+      if match
+        path_to_there = match[:path_str].split('/').map do |k|
+          if k =~ /\A\s*[0-9]+\s*\z/
+            k.to_i
+          else
+            k.to_sym
+          end
+        end
+        if path_to_here.prefixed_by(path_to_there)
+          raise "circular reference: #{tree}"
+        elsif (there_node = node_from_path(path_to_there))
+          #puts "valid cross reference: #{tree}"
+          #puts "  resolves to #{there_node}"
+        else
+          STDERR.puts "invalid cross reference: #{tree}"
+        end
+      end
+      # Other types are left alone
+    end
+  end
+
+  def self.node_from_path(path)
+    node = Ydl.data
+    path.each do |key|
+      if node.is_a?(Hash) && node.key?(key)
+        node = node[key]
+      elsif node.is_a?(Array) && key.to_i <= node.length
+        # We want the index for arrays to be 1-based.
+        node = node[key.to_i - 1]
+      else
+        return nil
+      end
+    end
+    node
+  end
+
   # Set the Ydl.config hash to the configuration given in the YAML string, cfg,
   # or read the config from the file ~/.ydl/config.yaml if cfg is nil
     Ydl.config['system_ydl_dir'] ||= SYSTEM_DIR
