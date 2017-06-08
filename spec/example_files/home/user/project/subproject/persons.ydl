@@ -31,3 +31,25 @@ morgan:
     city: New York
     state: NY
     zip: 10165
+
+erickson:
+  sex: entity
+  name: Erickson Incorporated
+  address:
+    street:
+      - c/o The Corporation Trust Company
+      - Corporation Trust Center, 1209 Orange Street
+    city: Wilmington
+    state: DE
+    zip: '19801'
+
+zmeac:
+  sex: entity
+  name: ZM EAC LLC
+  address:
+    street:
+      - ydl:/persons/morgan/address/street/1
+      - Suite 1400
+    city: New York
+    state: NY
+    zip: 10165

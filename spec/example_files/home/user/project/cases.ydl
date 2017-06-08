@@ -4,13 +4,13 @@ erickson:
   court: ydl:/courts/sdny
   judge: ydl:/judges/kbf
   plaintiffs:
-    - ydl:/person/mdg
-    - ydl:/person/mdg
+    - ydl:/persons/mdg
+    - ydl:/persons/mdg
   defendants:
-    - ydl:/person/morgan
-    - ydl:/person/zmpef1
-    - ydl:/person/zmpef2
-    - ydl:/person/zmeac
+    - ydl:/persons/morgan
+    - ydl:/persons/zmpef1
+    - ydl:/persons/zmpef2
+    - ydl:/persons/zmeac
   parties:
     -
       person: ydl:/persons/morgan
