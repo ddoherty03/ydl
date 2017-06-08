@@ -25,8 +25,8 @@ module Ydl
   #   string.
   # - ignore: /regexp/ :: ignore all .ydl files whose base name matches the
   #   given regexp.
-  # - ignore: [String|/regexp/] :: ignore all .ydl files whose base name matches any of
-  #   the given strings or regexp's.
+  # - ignore: [String|/regexp/] :: ignore all .ydl files whose base name matches
+  #   any of the given strings or regexp's.
   # - config: String :: use the config file given in the pathname String instead
   #   of the default in ~/.ydl/config.yaml.
   #
@@ -57,11 +57,16 @@ module Ydl
     result
   end
 
+  # Return the component at key from Ydl.data.
   def self.[](key)
     Ydl.data[key]
   end
 
   def self.ydl_files(ignore: nil)
+  # Return a list of all the .ydl files in order from lowest to highest
+  # priority, ignoring those whose basenames match the ignore parameter, which
+  # can be a String, a Regexp, or an Array of either (all of which are matched
+  # against the basename without the .ydl extension).
     file_names = []
     file_names += Dir.glob("#{Ydl.config['system_ydl_dir']}/**/*.ydl")
     file_names += Dir.glob(File.join(ENV['HOME'], '.ydl/**/*.ydl'))
@@ -85,6 +90,10 @@ module Ydl
     file_names
   end
 
+  # From the list of file name paths, names, delete those whose basename
+  # (without the .ydl extension) match the pattern or patterns in ~ignores~,
+  # which can be a String, a Regexp, or an Array of either.  Return the list
+  # thus filtered.
   def self.filter_ignores(names, ignores)
     ignores = [ignores] unless ignores.is_a?(Array)
     return names if ignores.empty?
@@ -105,6 +114,8 @@ module Ydl
     cfg_file = File.expand_path(cfg_file) if cfg_file
     cfg_file ||= File.expand_path(CONFIG_FILE)
     Ydl.config = YAML.load_file(cfg_file) if File.exist?(cfg_file)
+  # Set the Ydl.config hash to the configuration given in the YAML string, cfg,
+  # or read the config from the file ~/.ydl/config.yaml if cfg is nil
     Ydl.config['system_ydl_dir'] ||= SYSTEM_DIR
     Ydl.config
   end
