@@ -36,11 +36,11 @@ module Ydl
   # @param [Hash] options selectively ignore files; use alternative config
   # @return [Hash] data read from .ydl files as a Hash
   def self.load_all(resolve: true, config: nil, ignore: nil)
-    # Apply special config, if any
-    read_config(config.to_s) if config
+    # Apply special config, if any, or ~/.ydl/config.yaml if config is nil
+    read_config(config)
 
     # Load each file in order to self.data
-    file_names = ydl_files(ignore: ignore)
+    file_names = ydl_files(ignore: ignore, config: config)
     file_names.each do |fn|
       self.data = data.deep_merge(Ydl.load_file(fn))
     end
@@ -67,11 +67,12 @@ module Ydl
     Ydl.data[key]
   end
 
-  def self.ydl_files(ignore: nil)
   # Return a list of all the .ydl files in order from lowest to highest
   # priority, ignoring those whose basenames match the ignore parameter, which
   # can be a String, a Regexp, or an Array of either (all of which are matched
   # against the basename without the .ydl extension).
+  def self.ydl_files(ignore: nil, config: nil)
+    read_config(config)
     file_names = []
     file_names += Dir.glob("#{Ydl.config['system_ydl_dir']}/**/*.ydl")
     file_names += Dir.glob(File.join(ENV['HOME'], '.ydl/**/*.ydl'))
@@ -115,10 +116,6 @@ module Ydl
     result
   end
 
-  def self.read_config(cfg_file = nil)
-    cfg_file = File.expand_path(cfg_file) if cfg_file
-    cfg_file ||= File.expand_path(CONFIG_FILE)
-    Ydl.config = YAML.load_file(cfg_file) if File.exist?(cfg_file)
   # Convert all the cross-references of the form ydl:/path/to/other/entry to the
   # contents of that other entry by dup-ing the other entry into the Hash tree
   # where the cross-reference appeared.  This modifies Ydl.data in place.
@@ -174,9 +171,14 @@ module Ydl
 
   # Set the Ydl.config hash to the configuration given in the YAML string, cfg,
   # or read the config from the file ~/.ydl/config.yaml if cfg is nil
+  def self.read_config(cfg = nil)
+    if cfg
+      Ydl.config = YAML.safe_load(cfg)
+    else
+      cfg_file = File.expand_path(CONFIG_FILE)
+      Ydl.config = YAML.load_file(cfg_file) if File.exist?(cfg_file)
+    end
     Ydl.config['system_ydl_dir'] ||= SYSTEM_DIR
     Ydl.config
   end
-
-  read_config
 end
