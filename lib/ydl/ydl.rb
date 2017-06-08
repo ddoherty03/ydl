@@ -3,6 +3,8 @@ require 'active_support/core_ext/hash/deep_merge'
 require 'active_support/core_ext/hash/keys'
 
 module Ydl
+  using ArrayRefinements
+
   SYSTEM_DIR = '/usr/local/share/ydl'.freeze
   CONFIG_FILE = '~/.ydl/config.yaml'.freeze
 
