@@ -144,21 +144,21 @@ module Ydl
           end
         end
         if path_to_here.prefixed_by(path_to_there)
-        elsif (there_node = node_from_path(path_to_there))
-          #puts "valid cross reference: #{tree}"
-          #puts "  resolves to #{there_node}"
           raise CircularReference,
                 "circular reference: '#{tree}' at #{path_to_here}"
         end
+        if (there_node = node_at_path(path_to_there))
+          set_node(path_to_here, there_node)
         else
           STDERR.puts "invalid cross reference: #{tree}"
         end
       end
-      # Other types are left alone
     end
   end
 
-  def self.node_from_path(path)
+  # Return the node at path in Ydl.data or nil if there is no node at the given
+  # path.
+  def self.node_at_path(path)
     node = Ydl.data
     path.each do |key|
       if node.is_a?(Hash) && node.key?(key)
@@ -170,6 +170,15 @@ module Ydl
       end
     end
     node
+  end
+
+  # Set the node at path in Ydl.data to a dup of node.
+  def self.set_node(path, node)
+    cur_node = Ydl.data
+    path[0..-2].each do |key|
+      cur_node = cur_node[key]
+    end
+    cur_node[path.last] = node.deep_dup
   end
 
   # Set the Ydl.config hash to the configuration given in the YAML string, cfg,
