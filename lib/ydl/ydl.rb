@@ -164,8 +164,7 @@ module Ydl
       if node.is_a?(Hash) && node.key?(key)
         node = node[key]
       elsif node.is_a?(Array) && key.to_i <= node.length
-        # We want the index for arrays to be 1-based.
-        node = node[key.to_i - 1]
+        node = node[key.to_i]
       else
         return nil
       end
