@@ -4,6 +4,8 @@ require 'active_support/core_ext/hash/deep_merge'
 require 'active_support/core_ext/hash/keys'
 
 module Ydl
+  class CircularReference < RuntimeError; end
+
   using ArrayRefinements
 
   SYSTEM_DIR = '/usr/local/share/ydl'.freeze
@@ -142,10 +144,12 @@ module Ydl
           end
         end
         if path_to_here.prefixed_by(path_to_there)
-          raise "circular reference: #{tree}"
         elsif (there_node = node_from_path(path_to_there))
           #puts "valid cross reference: #{tree}"
           #puts "  resolves to #{there_node}"
+          raise CircularReference,
+                "circular reference: '#{tree}' at #{path_to_here}"
+        end
         else
           STDERR.puts "invalid cross reference: #{tree}"
         end
