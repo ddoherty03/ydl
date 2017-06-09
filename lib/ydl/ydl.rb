@@ -76,7 +76,7 @@ module Ydl
   def self.ydl_files(ignore: nil, config: nil)
     read_config(config)
     file_names = []
-    file_names += Dir.glob("#{Ydl.config['system_ydl_dir']}/**/*.ydl")
+    file_names += Dir.glob("#{Ydl.config[:system_ydl_dir]}/**/*.ydl")
     file_names += Dir.glob(File.join(ENV['HOME'], '.ydl/**/*.ydl'))
 
     # Find directories from pwd to home (or root), then reverse
@@ -182,7 +182,8 @@ module Ydl
       cfg_file = File.expand_path(CONFIG_FILE)
       Ydl.config = YAML.load_file(cfg_file) if File.exist?(cfg_file)
     end
-    Ydl.config['system_ydl_dir'] ||= SYSTEM_DIR
+    Ydl.config.deep_symbolize_keys!
+    Ydl.config[:system_ydl_dir] ||= SYSTEM_DIR
     Ydl.config
   end
 end
