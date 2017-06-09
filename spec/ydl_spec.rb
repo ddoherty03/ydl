@@ -41,6 +41,12 @@ RSpec.describe Ydl do
     end
   end
 
+  describe 'class instantiation' do
+    it 'should be able to find candidate classes' do
+      expect(Ydl.candidate_classes(:person))
+    end
+  end
+
   describe 'load_all' do
     before :all do
       @hsh = Ydl.load_all

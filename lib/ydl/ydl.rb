@@ -2,6 +2,7 @@ require 'ydl'
 require 'fat_core/string'
 require 'active_support/core_ext/hash/deep_merge'
 require 'active_support/core_ext/hash/keys'
+require 'active_support/core_ext/string'
 
 module Ydl
   class CircularReference < RuntimeError; end
@@ -134,7 +135,6 @@ module Ydl
       end
     when String
       match = tree.clean.match(%r{\Aydl:/(?<path_str>.*)\z})
-      #binding.pry if tree =~ /zmeac/
       if match
         path_to_there = match[:path_str].split('/').map do |k|
           if k =~ /\A\s*[0-9]+\s*\z/
@@ -179,6 +179,47 @@ module Ydl
       cur_node = cur_node[key]
     end
     cur_node[path.last] = node.deep_dup
+  end
+
+  def self.class_map(key)
+    return nil unless Ydl.config[:class_map].keys?.include(key.to_sym)
+    Ydl.config[:class_map][key.to_sym]
+  end
+
+  def self.candidate_classes(key, prefixes = nil)
+    result = []
+    # All known classes
+    # class_names = constants
+    #                 .select { |c| const_get(c).is_a?(Class) }
+    #                 .map(&:to_s)
+    class_names = ObjectSpace.each_object(Class).map(&:to_s)
+                    .select { |c| c =~ /^[A-Z]/ }
+                    .reject { |c| c =~ /^Errno::/ }
+
+    # Select those classes whose last component (or only component) is the
+    # camelized, signularized version of key
+    suffix = key.to_s.singularize.camelize
+    class_names =
+      class_names.select do |cls|
+        cls.split('::').last == suffix
+      end
+
+    # Now, select from those, the ones with one of the given prefixes.
+    if prefixes
+      prefixes = prefixes.split(',').map(&:clean) if prefixes.is_a?(String)
+      result =
+        class_names.select do |cls|
+          select = false
+          prefixes.each do |pfx|
+            pfx_arr = pfx.split('::')
+            select ||= cls.split('::').prefixed_by(pfx_arr)
+          end
+          select
+        end
+    else
+      result = class_names
+    end
+    result
   end
 
   # Set the Ydl.config hash to the configuration given in the YAML string, cfg,
