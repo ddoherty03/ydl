@@ -42,8 +42,51 @@ RSpec.describe Ydl do
   end
 
   describe 'class instantiation' do
-    it 'should be able to find candidate classes' do
-      expect(Ydl.candidate_classes(:person))
+    it 'should be able to find candidate classes within any module' do
+      cnds = Ydl.candidate_classes(:set)
+      expect(cnds.size).to eq(4)
+      expect(cnds).to include(Set)
+      expect(cnds).to include(Psych::Set)
+      expect(cnds).to include(RSpec::Core::Set)
+      expect(cnds).to include(OpenSSL::ASN1::Set)
+
+      # And alphabetical order
+      expect(cnds[0]).to eq(OpenSSL::ASN1::Set)
+      expect(cnds[1]).to eq(Psych::Set)
+      expect(cnds[2]).to eq(RSpec::Core::Set)
+      expect(cnds[3]).to eq(Set)
+    end
+
+    it 'should be able to find candidate classes within modules as string' do
+      cnds = Ydl.candidate_classes(:set, 'Psych')
+      expect(cnds.size).to eq(1)
+      expect(cnds).to include(Psych::Set)
+
+      cnds = Ydl.candidate_classes(:set, ',Psych, RSpec::Core')
+      expect(cnds.size).to eq(3)
+      expect(cnds).to include(Set)
+      expect(cnds).to include(Psych::Set)
+      expect(cnds).to include(RSpec::Core::Set)
+    end
+
+    it 'should find candidate_classes with modules as array' do
+      cnds = Ydl.candidate_classes(:set, ['', 'Psych'])
+      expect(cnds.size).to eq(2)
+      expect(cnds).to include(Set)
+      expect(cnds).to include(Psych::Set)
+    end
+
+    it 'should know how to map keys to classes' do
+      Ydl.read_config
+      expect(Ydl.class_map(:persons)).to eq('LawDoc::Person')
+      expect(Ydl.class_map(:address)).to eq('LawDoc::Address')
+      expect(Ydl.class_map(:junk)).to be nil
+    end
+
+    it 'should know init method for classes' do
+      Ydl.read_config
+      expect(Ydl.class_init('LawDoc::Person')).to eq(:from_hash)
+      expect(Ydl.class_init('LawDoc::Address')).to eq(:new)
     end
   end
 

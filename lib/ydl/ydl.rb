@@ -2,6 +2,7 @@ require 'ydl'
 require 'fat_core/string'
 require 'active_support/core_ext/hash/deep_merge'
 require 'active_support/core_ext/hash/keys'
+# For singularize, camelize
 require 'active_support/core_ext/string'
 
 module Ydl
@@ -182,44 +183,35 @@ module Ydl
   end
 
   def self.class_map(key)
-    return nil unless Ydl.config[:class_map].keys?.include(key.to_sym)
+    return nil unless Ydl.config[:class_map].keys.include?(key.to_sym)
     Ydl.config[:class_map][key.to_sym]
   end
 
-  def self.candidate_classes(key, prefixes = nil)
-    result = []
-    # All known classes
-    # class_names = constants
-    #                 .select { |c| const_get(c).is_a?(Class) }
-    #                 .map(&:to_s)
+  def self.class_init(klass_name)
+    return :new unless Ydl.config[:class_init].keys.include?(klass_name.to_sym)
+    Ydl.config[:class_init][klass_name.to_sym].to_sym
+  end
+
+  def self.candidate_classes(key, modules = nil)
+    # All known classes, except Errno
     class_names = ObjectSpace.each_object(Class).map(&:to_s)
                     .select { |c| c =~ /^[A-Z]/ }
                     .reject { |c| c =~ /^Errno::/ }
 
-    # Select those classes whose last component (or only component) is the
-    # camelized, signularized version of key
     suffix = key.to_s.singularize.camelize
-    class_names =
-      class_names.select do |cls|
-        cls.split('::').last == suffix
-      end
-
-    # Now, select from those, the ones with one of the given prefixes.
-    if prefixes
-      prefixes = prefixes.split(',').map(&:clean) if prefixes.is_a?(String)
-      result =
-        class_names.select do |cls|
-          select = false
-          prefixes.each do |pfx|
-            pfx_arr = pfx.split('::')
-            select ||= cls.split('::').prefixed_by(pfx_arr)
-          end
-          select
+    modules = modules.split(',').map(&:clean) if modules.is_a?(String)
+    class_names.select { |cls|
+      if modules
+        # If modules given, restrict to those classes within the modules, where
+        # a blank string is the main module.
+        modules.any? do |m|
+          cls =~ (m.blank? ? /\A#{suffix}\z/ : /\A#{m}::#{suffix}\z/)
         end
-    else
-      result = class_names
-    end
-    result
+      else
+        # Otherwise, all classes ending with suffix.
+        cls == suffix || cls =~ /::#{suffix}\z/
+      end
+    }.sort.map(&:constantize)
   end
 
   # Set the Ydl.config hash to the configuration given in the YAML string, cfg,

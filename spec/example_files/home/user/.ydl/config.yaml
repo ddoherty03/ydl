@@ -14,9 +14,12 @@
 #
 # then, only Dog::Breed and Cat::Breed will be searched for an existing breed
 # class. Otherwise, any class ending in Breed could be used, and they will be
-# searched in alphabetical order, and the first found will be used.
+# searched in alphabetical order, and the first found will be used.  A blank
+# value means to consider classes in the main, global module level.  You can
+# always disambiguate the class selected with the class_map option below.
 
-prefix_classes:
+class_modules:
+  -
   - Legal
   - Company::Employee
 
@@ -26,11 +29,11 @@ prefix_classes:
 # saying exactly which class a given key should map to.
 
 class_map:
-  people: Legal::Person
-  persons: Legal::Person
+  address: LawDoc::Address
+  persons: LawDoc::Person
 
 # Specify constructors for classes whose .new method will not take a Hash as an
 # argument to initialize the class.
 
 class_init:
-  Legal::Person: from_hash
+  LawDoc::Person: from_hash
