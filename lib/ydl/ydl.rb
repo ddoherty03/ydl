@@ -150,7 +150,7 @@ module Ydl
                 "circular reference: '#{tree}' at #{path_to_here}"
         end
         if (there_node = node_at_path(path_to_there))
-          set_node(path_to_here, there_node.deep_dup)
+          set_node(path_to_here, there_node.dup)
         else
           STDERR.puts "invalid cross reference: #{tree}"
         end
@@ -223,7 +223,7 @@ module Ydl
       else
         cur_node.each_pair do |key, val|
           next unless val.is_a?(Hash) || val.is_a?(Array)
-          klass = class_for(key) #|| cur_klass #class_for(path.last)
+          klass = class_for(key)
           instantiate_objects(val, klass, path + [key])
           set_node(path + [key], cur_node[key])
         end
@@ -246,11 +246,19 @@ module Ydl
     end
   end
 
+  #
+  mattr_accessor :class_for_cache
+  self.class_for_cache = {}
+
   def self.class_for(key)
     return nil if key.blank?
+    if class_for_cache[key]
+      return class_for_cache[key]
+    end
     return class_map(key) if class_map(key)
     klasses = candidate_classes(key, Ydl.config[:class_modules])
     return nil if klasses.empty?
+    class_for_cache[key] = klasses.first
     klasses.first
   end
 
@@ -269,15 +277,18 @@ module Ydl
     Ydl.config[:class_init][klass_name.to_sym].to_sym
   end
 
+  mattr_accessor :all_classes
+
   def self.candidate_classes(key, modules = nil)
-    # All known classes, except Errno
-    class_names = ObjectSpace.each_object(Class).map(&:to_s)
+    # Add all known classes to module attribute as a cache on first call; except
+    # Errno
+    all_classes ||= ObjectSpace.each_object(Class).map(&:to_s)
                     .select { |c| c =~ /^[A-Z]/ }
                     .reject { |c| c =~ /^Errno::/ }
 
     suffix = key.to_s.singularize.camelize
     modules = modules.split(',').map(&:clean) if modules.is_a?(String)
-    class_names.select { |cls|
+    all_classes.select { |cls|
       if modules
         # If modules given, restrict to those classes within the modules, where
         # a blank string is the main module.
