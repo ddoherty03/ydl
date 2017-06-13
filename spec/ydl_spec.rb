@@ -1,6 +1,10 @@
 require 'spec_helper'
 
 RSpec.describe Ydl do
+  before :all do
+    require 'test/law_doc_stub'
+  end
+
   it 'has a version number' do
     expect(Ydl::VERSION).not_to be nil
   end
@@ -78,8 +82,8 @@ RSpec.describe Ydl do
 
     it 'should know how to map keys to classes' do
       Ydl.read_config
-      expect(Ydl.class_map(:persons)).to eq('LawDoc::Person')
-      expect(Ydl.class_map(:address)).to eq('LawDoc::Address')
+      expect(Ydl.class_map(:persons)).to eq(LawDoc::Person)
+      expect(Ydl.class_map(:address)).to eq(LawDoc::Address)
       expect(Ydl.class_map(:junk)).to be nil
     end
 
@@ -98,13 +102,13 @@ RSpec.describe Ydl do
     it 'should return a merged Hash keyed by symbols' do
       expect(@hsh.class).to eq(Hash)
       expect(Ydl.data.class).to eq(Hash)
-      expect(Ydl.data[:lawyers][:ded].class).to eq(Hash)
+      expect(Ydl.data[:lawyers][:ded].class).to eq(LawDoc::Lawyer)
       expect(Ydl.data.keys.sort)
         .to eq(%i[cases courts judges junk lawyers persons])
     end
 
     it 'should resolve cross references' do
-      expect(Ydl[:cases][:erickson][:parties][1][:lawyers][0][:last])
+      expect(Ydl[:cases][:erickson][:parties][1].lawyers[0].last)
         .to eq('Doherty')
     end
 
