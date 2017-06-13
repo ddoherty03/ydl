@@ -5,7 +5,7 @@ erickson:
   judge: ydl:/judges/kbf
   parties:
     -
-      person: ydl/persons/mdg
+      person: ydl:/persons/mdg
       role: Plaintiff
       lawyers:
         - ydl:/lawyers/ded

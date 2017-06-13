@@ -5,8 +5,7 @@ ded:
   first: Daniel
   middle: E.
   address:
-    street1: 7300 W. 110th Street, Suite 930
-    street2:
+    street: 7300 W. 110th Street, Suite 930
     city: Overland Park
     state: KS
     zip: 66210
@@ -26,7 +25,7 @@ cjh:
   first: Charles
   middle: J.
   address:
-    street1: 7300 W. 110th Street, Suite 930
+    street: 7300 W. 110th Street, Suite 930
     city: Overland Park
     state: KS
     zip: "66210"

@@ -20,7 +20,7 @@
 
 class_modules:
   -
-  - Legal
+  - LawDoc
   - Company::Employee
 
 # By default, each key will be camelized and singularized to find the matching
@@ -31,6 +31,7 @@ class_modules:
 class_map:
   address: LawDoc::Address
   persons: LawDoc::Person
+  fax: LawDoc::Phone
 
 # Specify constructors for classes whose .new method will not take a Hash as an
 # argument to initialize the class.
