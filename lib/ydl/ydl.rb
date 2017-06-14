@@ -191,6 +191,7 @@ module Ydl
   end
 
   def self.instantiate_objects(cur_node, cur_klass, path = [])
+    # STDERR.puts path.join(':')
     case cur_node
     when Hash
       if cur_klass
@@ -204,13 +205,16 @@ module Ydl
               next unless val.is_a?(Hash) || val.is_a?(Array)
               instantiate_objects(cur_node[key], nil, path + [key])
               klass = class_for(key) # || cur_klass
+              next if xref_to_path(val)
               if klass
                 konstructor = class_init(klass.name)
                 set_node(path + [key], klass.send(konstructor, val))
               end
             end
-            konstructor = class_init(cur_klass.name)
-            set_node(path, cur_klass.send(konstructor, cur_node))
+            unless xref_to_path(cur_node)
+              konstructor = class_init(cur_klass.name)
+              set_node(path, cur_klass.send(konstructor, cur_node))
+            end
           else
             cur_node.each_pair do |key, val|
               next unless val.is_a?(Hash) || val.is_a?(Array)
@@ -218,6 +222,7 @@ module Ydl
               klass = class_for(key)
               instantiate_objects(cur_node[key], klass, path + [key])
               # Then set the in the Ydl.data tree
+              next if xref_to_path(val)
               konstructor = class_init(cur_klass.name)
               set_node(path + [key], cur_klass.send(konstructor, val))
             end
@@ -243,6 +248,7 @@ module Ydl
         konstructor = class_init(cur_klass.name)
         cur_node.each_with_index do |node, k|
           instantiate_objects(node, nil, path + [k])
+          next if xref_to_path(node)
           set_node(path + [k], cur_klass.send(konstructor, node))
         end
       else
