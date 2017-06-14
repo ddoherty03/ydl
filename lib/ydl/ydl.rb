@@ -121,6 +121,20 @@ module Ydl
     result
   end
 
+  # Return an Array of symbols and integers representing a the path described by
+  # a ydl xref string. Return nil if str is not an xref string.
+  def self.xref_to_path(str)
+    match = str.to_s.clean.match(%r{\Aydl:/(?<path_str>.*)\z})
+    return nil unless match
+    match[:path_str].split('/').map do |k|
+      if k =~ /\A\s*[0-9]+\s*\z/
+        k.to_i
+      else
+        k.to_sym
+      end
+    end
+  end
+
   # Convert all the cross-references of the form ydl:/path/to/other/entry to the
   # contents of that other entry by dup-ing the other entry into the Hash tree
   # where the cross-reference appeared.  This modifies Ydl.data in place.
@@ -136,15 +150,8 @@ module Ydl
         resolve_xref(val, path_to_here: root_path + [k])
       end
     when String
-      match = tree.clean.match(%r{\Aydl:/(?<path_str>.*)\z})
-      if match
-        path_to_there = match[:path_str].split('/').map do |k|
-          if k =~ /\A\s*[0-9]+\s*\z/
-            k.to_i
-          else
-            k.to_sym
-          end
-        end
+      path_to_there = xref_to_path(tree)
+      if path_to_there
         if path_to_here.prefixed_by(path_to_there)
           raise CircularReference,
                 "circular reference: '#{tree}' at #{path_to_here}"
