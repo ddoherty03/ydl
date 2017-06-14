@@ -49,8 +49,8 @@ module Ydl
       self.data = data.deep_merge(Ydl.load_file(fn))
     end
 
-    resolve_xref(data) if resolve
     instantiate_objects(data, nil) if instantiate
+    resolve_xref(data) if resolve
 
     # Revert special config to default config
     read_config if config
