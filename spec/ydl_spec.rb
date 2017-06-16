@@ -108,8 +108,7 @@ RSpec.describe Ydl do
     end
 
     it 'should resolve cross references' do
-      expect(Ydl[:cases][:erickson][:parties][1].lawyers[0].last)
-        .to eq('Doherty')
+      expect(Ydl[:cases][:erickson].parties.first.lawyers.first.last).to eq('Doherty')
     end
 
     it 'should allow access through []' do
