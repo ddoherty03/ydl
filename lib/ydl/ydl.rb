@@ -6,7 +6,6 @@ require 'active_support/core_ext/hash/keys'
 require 'active_support/core_ext/string'
 
 module Ydl
-  class CircularReference < RuntimeError; end
 
   using ArrayRefinements
 
@@ -39,18 +38,20 @@ module Ydl
   #
   # @param [Hash] options selectively ignore files; use alternative config
   # @return [Hash] data read from .ydl files as a Hash
-  def self.load_all(resolve: true, instantiate: true, config: nil, ignore: nil)
+  def self.load_all(config: nil, ignore: nil)
     # Apply special config, if any, or ~/.ydl/config.yaml if config is nil
     read_config(config)
 
     # Load each file in order to self.data
+    tree = {}
     file_names = ydl_files(ignore: ignore, config: config)
     file_names.each do |fn|
-      self.data = data.deep_merge(Ydl.load_file(fn))
+      tree = tree.deep_merge(Ydl.load_file(fn))
     end
 
-    instantiate_objects(data, nil) if instantiate
-    resolve_xref(data) if resolve
+    self.data = Tree.new(tree)
+    self.data = data.resolve_xrefs
+    self.data = data.to_params
 
     # Revert special config to default config
     read_config if config
@@ -121,153 +122,12 @@ module Ydl
     result
   end
 
-  # Return an Array of symbols and integers representing a the path described by
-  # a ydl xref string. Return nil if str is not an xref string.
-  def self.xref_to_path(str)
-    match = str.to_s.clean.match(%r{\Aydl:/(?<path_str>.*)\z})
-    return nil unless match
-    match[:path_str].split('/').map do |k|
-      if k =~ /\A\s*[0-9]+\s*\z/
-        k.to_i
-      else
-        k.to_sym
-      end
-    end
-  end
-
-  # Convert all the cross-references of the form ydl:/path/to/other/entry to the
-  # contents of that other entry by dup-ing the other entry into the Hash tree
-  # where the cross-reference appeared.  This modifies Ydl.data in place.
-  def self.resolve_xref(tree, path_to_here: [])
-    root_path = path_to_here.dup
-    case tree
-    when Hash
-      tree.each_pair do |key, val|
-        resolve_xref(val, path_to_here: root_path + [key])
-      end
-    when Array
-      tree.each_with_index do |val, k|
-        resolve_xref(val, path_to_here: root_path + [k])
-      end
-    when String
-      path_to_there = xref_to_path(tree)
-      if path_to_there
-        if path_to_here.prefixed_by(path_to_there)
-          raise CircularReference,
-                "circular reference: '#{tree}' at #{path_to_here}"
-        end
-        if (there_node = node_at_path(path_to_there))
-          set_node(path_to_here, there_node.dup)
-        else
-          STDERR.puts "invalid cross reference: #{tree}"
-        end
-      end
-    end
-  end
-
-  # Return the node at path in Ydl.data or nil if there is no node at the given
-  # path.
-  def self.node_at_path(path)
-    node = Ydl.data
-    path.each do |key|
-      if node.is_a?(Hash) && node.key?(key)
-        node = node[key]
-      elsif node.is_a?(Array) && key.to_i <= node.length
-        node = node[key.to_i]
-      else
-        return nil
-      end
-    end
-    node
-  end
-
-  # Set the node at path in Ydl.data to node.
-  def self.set_node(path, node)
-    cur_node = Ydl.data
-    path[0..-2].each do |key|
-      cur_node = cur_node[key]
-    end
-    cur_node[path.last] = node
-  end
-
-  def self.instantiate_objects(cur_node, cur_klass, path = [])
-    # STDERR.puts path.join(':')
-    case cur_node
-    when Hash
-      if cur_klass
-        instantiate_here = true
-        begin
-          # Two cases to consider: (1) cur_node is the argument hash for
-          # instantiating an object at cur_node, (2) cur_node is a hash, each
-          # element of which is to be instantiated as an object of cur_klass.
-          if instantiate_here
-            cur_node.each_pair do |key, val|
-              next unless val.is_a?(Hash) || val.is_a?(Array)
-              instantiate_objects(cur_node[key], nil, path + [key])
-              klass = class_for(key) # || cur_klass
-              next if xref_to_path(val)
-              if klass
-                konstructor = class_init(klass.name)
-                set_node(path + [key], klass.send(konstructor, val))
-              end
-            end
-            unless xref_to_path(cur_node)
-              konstructor = class_init(cur_klass.name)
-              set_node(path, cur_klass.send(konstructor, cur_node))
-            end
-          else
-            cur_node.each_pair do |key, val|
-              next unless val.is_a?(Hash) || val.is_a?(Array)
-              # Instantiate all the sub-nodes first
-              klass = class_for(key)
-              instantiate_objects(cur_node[key], klass, path + [key])
-              # Then set the in the Ydl.data tree
-              next if xref_to_path(val)
-              konstructor = class_init(cur_klass.name)
-              set_node(path + [key], cur_klass.send(konstructor, val))
-            end
-          end
-        rescue ArgumentError, /unknown keywords/ => ex
-          raise ex unless instantiate_here
-          instantiate_here = false
-          retry
-        end
-      else
-        cur_node.each_pair do |key, val|
-          next unless val.is_a?(Hash) || val.is_a?(Array)
-          klass = class_for(key)
-          instantiate_objects(val, klass, path + [key])
-          set_node(path + [key], cur_node[key])
-        end
-      end
-    when Array
-      # Two cases: (1) cur_klass is defined, so we want an Array of instantiated
-      # cur_klass objects at cur_node, (2) cur_klass is nil, just recurse down
-      # the tree.
-      if cur_klass
-        konstructor = class_init(cur_klass.name)
-        cur_node.each_with_index do |node, k|
-          instantiate_objects(node, nil, path + [k])
-          next if xref_to_path(node)
-          set_node(path + [k], cur_klass.send(konstructor, node))
-        end
-      else
-        cur_node.each_with_index do |node, k|
-          instantiate_objects(node, nil, path + [k])
-        end
-      end
-    end
-  end
-
-  #
   mattr_accessor :class_for_cache
   self.class_for_cache = {}
 
   def self.class_for(key)
     return nil if key.blank?
-    if class_for_cache[key]
-      return class_for_cache[key]
-    end
+    return class_for_cache[key] if class_for_cache[key]
     return class_map(key) if class_map(key)
     klasses = candidate_classes(key, Ydl.config[:class_modules])
     return nil if klasses.empty?
@@ -281,7 +141,7 @@ module Ydl
     return nil unless Ydl.config[:class_map].keys.include?(key.to_sym)
     klass_name = Ydl.config[:class_map][key.to_sym]
     klass_name.constantize
-  rescue NameError => ex
+  rescue NameError
     raise "no declared class named '#{klass_name}'"
   end
 
@@ -295,9 +155,11 @@ module Ydl
   def self.candidate_classes(key, modules = nil)
     # Add all known classes to module attribute as a cache on first call; except
     # Errno
-    all_classes ||= ObjectSpace.each_object(Class).map(&:to_s)
-                    .select { |c| c =~ /^[A-Z]/ }
-                    .reject { |c| c =~ /^Errno::/ }
+    all_classes ||=
+      ObjectSpace.each_object(Class)
+        .map(&:to_s)
+        .select { |c| c =~ /^[A-Z]/ }
+        .reject { |c| c =~ /^Errno::/ }
 
     suffix = key.to_s.singularize.camelize
     modules = modules.split(',').map(&:clean) if modules.is_a?(String)
