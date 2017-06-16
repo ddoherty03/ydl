@@ -20,7 +20,6 @@ module Ydl
     attr_accessor :data
   end
   self.config = {}
-  self.data = {}
 
   # Load all .ydl files, subject to the given options.  After loading, the data
   # in the .ydl files will be available in Ydl.data and accessible with Ydl[].
