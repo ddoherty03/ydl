@@ -27,9 +27,17 @@ module LawDoc
       msg = 'set name only for entities; use name components otherwise'
       raise ArgumentError, msg if name && @sex != 'entity'
       @name = name
-      msg = 'address must be a LawDoc::Address'
-      raise ArgumentError, msg if address && !address.is_a?(Address)
-      @address = address
+      case address
+      when Address
+        @address = address
+      when Hash
+        @address = Address.new(address)
+      when NilClass
+        @address = nil
+      else
+        msg = "cannot initialize address with #{address.class.name}"
+        raise ArgumentError, msg
+      end
     end
 
     def self.from_hash(hsh)
@@ -59,8 +67,14 @@ module LawDoc
       end
       @city = city
       @state = state
-      @zip = zip
+      @zip = zip.to_s
       @country = country
+    end
+  end
+
+  class Phone
+    def initialize(str)
+      @phone = str
     end
   end
 
@@ -82,7 +96,27 @@ module LawDoc
         super(other)
       end
       @role = role
-      @lawyers = lawyers
+      case lawyers
+      when Lawyer
+        @lawyers = [lawyers]
+      when Array
+        unless lawyers.all? { |l| l.is_a?(Lawyer) || l.is_a?(Hash) }
+          raise ArgumentError, 'lawyers array must be Lawyer objects'
+        end
+        @lawyers = lawyers.map do |l|
+          case l
+          when Lawyer
+            l
+          when Hash
+            Lawyer.new(l)
+          end
+        end
+      when NilClass
+        @lawyers = []
+      else
+        raise ArgumentError,
+              "cannot initialize lawyers with #{lawyers.class.name}"
+      end
     end
   end
 
@@ -116,6 +150,40 @@ module LawDoc
     def initialize(**other)
       other[:sex] = 'entity'
       super(other)
+    end
+  end
+
+  class Case
+    attr_reader :parties
+    def initialize(number: nil,
+                   complaint_date: nil,
+                   court: nil,
+                   judge: nil,
+                   parties: []
+                  )
+      @number = number
+      @complaint_date = complaint_date
+      case court
+      when Court
+        @court = court
+      when Hash
+        @court = Court.new(court)
+      when NilClass
+        @court = nil
+      else
+        raise ArgumentError, "court of class #{court.class} invalid"
+      end
+      case judge
+      when Judge
+        @judge = judge
+      when Hash
+        @judge = Judge.new(judge)
+      when NilClass
+        @judge = nil
+      else
+        raise ArgumentError, "judge of class #{judge.class} invalid"
+      end
+      @parties = parties
     end
   end
 end

@@ -36,10 +36,17 @@ module Ydl
       @resolved
     end
 
+    # The key for this Node.
+    def key
+      path.last
+    end
+
+    # The keys for children Nodes.
     def keys
       children.keys
     end
 
+    # Does this Node include key.
     def key?(key)
       keys.include?(key)
     end
@@ -57,15 +64,38 @@ module Ydl
     end
 
     def resolve_xref
-      return self unless @referee
-      ref_path = Tree.xref_to_path(@referee)
-      obj = Ydl.data.node_at_path(ref_path)
-      if obj.val.class == klass
-        @val = obj.val
+      if @referee
+        ref_path = Tree.xref_to_path(@referee)
+        obj = Ydl.data.node_at_path(ref_path)
+        if obj.val.class == klass
+          @val = obj.val
+          @resolved = true
+        end
+      else
         @resolved = true
       end
-      instantiate
+      unless instantiated?
+        obj = instantiate
+        @val = obj if obj
+      end
       self
+    end
+
+    # Convert this Node's children to a Hash suitable for use as an argument to
+    # a constructor.
+    def to_params
+      make_arr = children.keys.map(&:to_s).all? { |k| k =~ /\A[0-9]+\z/ }
+      result = make_arr ? [] : {}
+      children.each_pair do |k, child|
+        k = make_arr ? k.to_s.to_i : k
+        result[k] =
+          if child.children.empty? || child.val.class == child.klass
+            child.val
+          else
+            child.to_params
+          end
+      end
+      result
     end
 
     private
@@ -129,6 +159,8 @@ module Ydl
       self
     end
 
+    public
+
     def instantiated?
       return true if val.class == klass
       result = false
@@ -138,6 +170,8 @@ module Ydl
       result
     end
 
+    private
+
     # Return an object of class klass if one can be initialized with the Hash
     # val.
     def instantiate
@@ -146,8 +180,7 @@ module Ydl
       if val
         klass.send(konstructor, val)
       elsif resolved?
-        binding.pry
-        klass.send(konstructor, val)
+        klass.send(konstructor, to_params)
       end
     rescue ArgumentError
       return nil

@@ -14,6 +14,10 @@ module Ydl
       @root[key]
     end
 
+    def to_params
+      @root.to_params
+    end
+
     def keys
       @root.keys
     end
@@ -28,6 +32,7 @@ module Ydl
         node = node_at_path(path)
         node.resolve_xref unless node.resolved?
       end
+      self
     end
 
     # Return the node at path in Ydl.data or nil if there is no node at the given
