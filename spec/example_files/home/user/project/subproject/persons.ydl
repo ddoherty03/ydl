@@ -48,7 +48,7 @@ zmeac:
   name: ZM EAC LLC
   address:
     street:
-      - ydl:/persons/morgan/address/street/1
+      - 60 East 42nd Street
       - Suite 1400
     city: New York
     state: NY
