@@ -1,10 +1,11 @@
 module Ydl
   # A Node in a Ydl::Tree
   class Node
-    attr_reader :path, :val, :children, :klass, :referee
+    attr_reader :path, :root_id, :val, :children, :klass, :referee
 
-    def initialize(path, val, klass = nil)
+    def initialize(path, val, klass = nil, root_id:)
       @path = path
+      @root_id = root_id
       @klass = klass
       @val = val
       # Child Nodes; always a Hash, but keys may be numeric symbols, such a
@@ -15,6 +16,12 @@ module Ydl
       @depends_on = []
       build
       self
+    end
+
+    # Return a reference to the Ydl::Tree to which this Node belongs, in case we
+    # instantiate more than one tree.
+    def this_tree
+      ObjectSpace._id2ref(root_id)
     end
 
     def resolved?
@@ -51,7 +58,7 @@ module Ydl
     def resolve_xref
       if @referee
         ref_path = Tree.xref_to_path(@referee)
-        obj = Ydl.data.node_at_path(ref_path)
+        obj = this_tree.node_at_path(ref_path)
         if obj.val.class == klass
           @val = obj.val
           @resolved = true
@@ -128,7 +135,7 @@ module Ydl
           children_resolved = true
           val.each_pair do |k, v|
             klass = Ydl.class_for(k) || @klass
-            child = Node.new(path + [k], v, klass)
+            child = Node.new(path + [k], v, klass, root_id: root_id)
             @depends_on << child.referee unless child.referee.blank?
             @children[k] = child
             children_resolved &&= child.resolved?
@@ -139,7 +146,7 @@ module Ydl
         @referee = nil
       when Array
         val.each_with_index do |v, k|
-          child = Node.new(path + [k.to_s.to_sym], v, @klass)
+          child = Node.new(path + [k.to_s.to_sym], v, @klass, root_id: root_id)
           @depends_on << child.referee unless child.referee.blank?
           @children[k.to_s.to_sym] = child
         end

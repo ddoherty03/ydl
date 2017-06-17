@@ -5,8 +5,14 @@ module Ydl
     cattr_accessor :workq
     self.workq = Ydl::TopQueue.new
 
+    cattr_accessor :trees
+    self.trees = []
+
     def initialize(hsh)
-      @root = Node.new([], hsh)
+      @id = object_id
+      @root = Node.new([], hsh, root_id: @id)
+      resolve_xrefs
+      trees << self
     end
 
     def [](key)
