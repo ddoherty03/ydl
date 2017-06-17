@@ -94,9 +94,9 @@ RSpec.describe Ydl do
     end
   end
 
-  describe 'load_all' do
+  describe 'load' do
     before :all do
-      @hsh = Ydl.load_all
+      @hsh = Ydl.load
     end
 
     it 'should return a merged Hash keyed by symbols' do
