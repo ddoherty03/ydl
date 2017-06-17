@@ -94,6 +94,37 @@ RSpec.describe Ydl do
     end
   end
 
+  describe 'selective load' do
+    before :all do
+      @hsh = Ydl.load('persons')
+    end
+
+    it 'should return a merged Hash keyed by symbols' do
+      expect(@hsh.class).to eq(Hash)
+      expect(@hsh.class).to eq(Hash)
+      expect(@hsh[:revive].class).to eq(LawDoc::Person)
+      expect(@hsh.keys.sort)
+        .to eq(%i[erickson mdg morgan revive zmeac zmpef1 zmpef2])
+    end
+
+    it 'should resolve cross references' do
+      expect(@hsh[:erickson].name).to eq('Erickson Incorporated')
+    end
+
+    it 'should instantiate all objects' do
+      klasses = { persons: 'LawDoc::Person' }
+      klasses.each_pair do |sym, kls|
+        Ydl[sym].each_pair do |_nm, obj|
+          expect(obj.class.name).to eq(kls)
+        end
+      end
+    end
+
+    it 'should allow access through []' do
+      expect(Ydl.data[:persons].class).to eq(Hash)
+      expect(Ydl[:persons].class).to eq(Hash)
+    end
+  end
 
   describe 'load' do
     before :all do

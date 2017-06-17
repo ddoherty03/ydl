@@ -47,7 +47,13 @@ module Ydl
     self.data = Tree.new(yaml)
     self.data = data.resolve_xrefs
     self.data = data.to_params
-    data
+
+    # Just return the base name's branch if base is set
+    if data.keys.include?(base.to_sym)
+      data[base.to_sym]
+    else
+      data
+    end
   end
 
   # Return a Hash with a single key of the basename of the given file and a
@@ -86,7 +92,7 @@ module Ydl
 
     # Gather the .ydl files in those directories
     dir_list.each do |d|
-      file_names += Dir.glob("#{d}/*.ydl")
+      file_names += Dir.glob("#{d}/#{glob}.ydl")
     end
 
     # Filter out any files whose base name matches options[:ignore]
