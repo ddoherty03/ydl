@@ -3,21 +3,6 @@ module Ydl
   class Node
     attr_reader :path, :val, :children, :klass, :referee
 
-    # The val is either (1) a String (not a cross-reference) or a Date (or a
-    # Numeric? or a Boolean?) that is the direct value of the Node, in which
-    # case, @children must be empty and the Node is considered "resolved", or
-    # (2) a String that is a cross reference, in which case it needs to be
-    # resolved and the Node at the path up to the penultimate component
-    # becomes a "prerequisite" to resolving this Node; if its prerequisites
-    # are resolved, set @val to that Node and set this Node to resolved;
-    # otherwise, place this Node on a queue of unresolved Nodes that need to
-    # be re-visited after the prerequisite is resolved; once the
-    # cross-reference is resolved, @val become a reference to the other object
-    # in the tree and this Node is marked resolved and removed from the queue,
-    # or (3) a Hash in which case its elements become the children of this
-    # Node and @val is set to nil, or (4) an Array, in which case its elements
-    # become the children of this Node (with their numeric indices as keys)
-    # and @val is set nil.
     def initialize(path, val, klass = nil)
       @path = path
       @klass = klass
@@ -104,6 +89,22 @@ module Ydl
     # instance variables. Attempt to instantiate the node's val into an object
     # of type klass if possible; record cross-references in Ydl::Tree.workq for
     # later resolution.
+    #
+    # The val is either (1) a String (not a cross-reference) or a Date (or a
+    # Numeric? or a Boolean?) that is the direct value of the Node, in which
+    # case, @children must be empty and the Node is considered "resolved", or
+    # (2) a String that is a cross reference, in which case it needs to be
+    # resolved and the Node at the path up to the penultimate component
+    # becomes a "prerequisite" to resolving this Node; if its prerequisites
+    # are resolved, set @val to that Node and set this Node to resolved;
+    # otherwise, place this Node on a queue of unresolved Nodes that need to
+    # be re-visited after the prerequisite is resolved; once the
+    # cross-reference is resolved, @val become a reference to the other object
+    # in the tree and this Node is marked resolved and removed from the queue,
+    # or (3) a Hash in which case its elements become the children of this
+    # Node and @val is set to nil, or (4) an Array, in which case its elements
+    # become the children of this Node (with their numeric indices as keys)
+    # and @val is set nil.
     def build
       case val
       when String
@@ -171,7 +172,7 @@ module Ydl
     private
 
     # Return an object of class klass if one can be initialized with the Hash
-    # val.
+    # val or the current Node converted to a params hash.
     def instantiate
       return nil if klass.blank?
       return val if instantiated?

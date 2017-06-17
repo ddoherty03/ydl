@@ -35,8 +35,8 @@ module Ydl
       self
     end
 
-    # Return the node at path in Ydl.data or nil if there is no node at the given
-    # path.
+    # Return the node at path in Ydl.data or nil if there is no node at the
+    # given path.
     def node_at_path(path)
       node = @root
       partial_path = []
