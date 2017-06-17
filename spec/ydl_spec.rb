@@ -109,6 +109,16 @@ RSpec.describe Ydl do
 
     it 'should resolve cross references' do
       expect(Ydl[:cases][:erickson].parties.first.lawyers.first.last).to eq('Doherty')
+
+    it 'should instantiate all objects' do
+      klasses = { cases: 'LawDoc::Case', courts: 'LawDoc::Court',
+                  judges: 'LawDoc::Judge', lawyers: 'LawDoc::Lawyer',
+                  persons: 'LawDoc::Person' }
+      klasses.each_pair do |sym, kls|
+        Ydl[sym].each_pair do |_nm, obj|
+          expect(obj.class.name).to eq(kls)
+        end
+      end
     end
 
     it 'should allow access through []' do
