@@ -26,16 +26,33 @@ module LawDoc
       @suffix = suffix
       msg = 'set name only for entities; use name components otherwise'
       raise ArgumentError, msg if name && @sex != 'entity'
+      @address = init_address(address)
+      @phone = init_phone(phone)
+      @fax = init_phone(fax, field: 'fax')
       @name = name
-      case address
-      when Address
-        @address = address
+      @email = email
+    end
+
+    def init_address(addr, field: 'address')
+      case addr
+      when Address, NilClass
+        @address = addr
       when Hash
-        @address = Address.new(address)
-      when NilClass
-        @address = nil
+        @address = Address.new(addr)
       else
-        msg = "cannot initialize address with #{address.class.name}"
+        msg = "cannot initialize #{field} with #{addr.class.name}"
+        raise ArgumentError, msg
+      end
+    end
+
+    def init_phone(phn, field: 'phone')
+      case phn
+      when Phone, NilClass
+        @phone = phn
+      when String
+        @phone = Phone.new(phn)
+      else
+        msg = "cannot initialize #{field} with #{phn.class.name}"
         raise ArgumentError, msg
       end
     end
@@ -159,9 +176,8 @@ module LawDoc
                    complaint_date: nil,
                    court: nil,
                    judge: nil,
-                   parties: []
-                  )
-      @number = number
+                   parties: [])
+      @number = number.to_s
       @complaint_date = complaint_date
       case court
       when Court
