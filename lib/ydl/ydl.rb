@@ -38,14 +38,13 @@ module Ydl
   def self.load(base = '*', ignore: nil)
     Ydl.read_config
     # Load each file in order to self.data
-    tree = {}
-    file_names = ydl_files(ignore: ignore)
+    yaml = {}
     file_names = ydl_files(glob: base, ignore: ignore)
     file_names.each do |fn|
-      tree = tree.deep_merge(Ydl.load_file(fn))
+      yaml = yaml.deep_merge(Ydl.load_file(fn))
     end
 
-    self.data = Tree.new(tree)
+    self.data = Tree.new(yaml)
     self.data = data.resolve_xrefs
     self.data = data.to_params
     data
