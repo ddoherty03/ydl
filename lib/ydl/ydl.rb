@@ -35,11 +35,12 @@ module Ydl
   #
   # @param [Hash] options selectively ignore files; use alternative config
   # @return [Hash] data read from .ydl files as a Hash
-  def self.load_all(ignore: nil)
+  def self.load(base = '*', ignore: nil)
     Ydl.read_config
     # Load each file in order to self.data
     tree = {}
     file_names = ydl_files(ignore: ignore)
+    file_names = ydl_files(glob: base, ignore: ignore)
     file_names.each do |fn|
       tree = tree.deep_merge(Ydl.load_file(fn))
     end
