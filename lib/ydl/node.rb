@@ -133,9 +133,7 @@ module Ydl
             children_resolved &&= child.resolved?
           end
           @val = nil
-          # @resolved = false
           @resolved = children_resolved
-          obj = klass ? instantiate : nil
         end
         @referee = nil
       when Array
