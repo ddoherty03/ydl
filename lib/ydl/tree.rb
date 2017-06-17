@@ -33,6 +33,8 @@ module Ydl
         node.resolve_xref unless node.resolved?
       end
       self
+    rescue TSort::Cyclic => ex
+      raise Ydl::CircularReference, ex.to_s
     end
 
     # Return the node at path in Ydl.data or nil if there is no node at the
