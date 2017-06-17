@@ -36,6 +36,7 @@ module Ydl
   # @param [Hash] options selectively ignore files; use alternative config
   # @return [Hash] data read from .ydl files as a Hash
   def self.load_all(ignore: nil)
+    Ydl.read_config
     # Load each file in order to self.data
     tree = {}
     file_names = ydl_files(ignore: ignore)
@@ -69,6 +70,7 @@ module Ydl
   # can be a String, a Regexp, or an Array of either (all of which are matched
   # against the basename without the .ydl extension).
   def self.ydl_files(ignore: nil)
+    read_config
     file_names = []
     file_names += Dir.glob("#{Ydl.config[:system_ydl_dir]}/**/*.ydl")
     file_names += Dir.glob(File.join(ENV['HOME'], '.ydl/**/*.ydl'))
@@ -178,6 +180,3 @@ module Ydl
     Ydl.config
   end
 end
-
-# Read the configuration on loading this file.
-Ydl.read_config
