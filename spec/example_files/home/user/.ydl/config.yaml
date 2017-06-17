@@ -8,7 +8,7 @@
 # can restrict the search for classes named 'Breed' only in modules, 'Dog' and
 # 'Cat' with this:
 #
-#   prefix_classes:
+#   class_modules
 #     - Dog
 #     - Cat
 #
