@@ -20,6 +20,7 @@ module Ydl
     attr_accessor :data
   end
   self.config = {}
+  self.data = {}
 
   # Load all .ydl files, subject to the given options.  After loading, the data
   # in the .ydl files will be available in Ydl.data and accessible with Ydl[].
@@ -44,9 +45,8 @@ module Ydl
       yaml = yaml.deep_merge(Ydl.load_file(fn))
     end
 
-    self.data = Tree.new(yaml)
-    self.data = data.resolve_xrefs
-    self.data = data.to_params
+    tree = Tree.new(yaml).to_params
+    self.data = data.merge(tree)
 
     # Just return the base name's branch if base is set
     if data.keys.include?(base.to_sym)

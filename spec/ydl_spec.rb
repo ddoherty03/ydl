@@ -96,23 +96,40 @@ RSpec.describe Ydl do
 
   describe 'selective load' do
     before :all do
-      @hsh = Ydl.load('persons')
+      @people = Ydl.load('persons')
+      @lawyers = Ydl.load('lawyers')
     end
 
     it 'should return a merged Hash keyed by symbols' do
-      expect(@hsh.class).to eq(Hash)
-      expect(@hsh.class).to eq(Hash)
-      expect(@hsh[:revive].class).to eq(LawDoc::Person)
-      expect(@hsh.keys.sort)
+      expect(@people.class).to eq(Hash)
+      expect(@people.class).to eq(Hash)
+      expect(@people[:revive].class).to eq(LawDoc::Person)
+      expect(@people.keys.sort)
         .to eq(%i[erickson mdg morgan revive zmeac zmpef1 zmpef2])
+
+      expect(@lawyers.class).to eq(Hash)
+      expect(@lawyers.class).to eq(Hash)
+      expect(@lawyers[:ded].class).to eq(LawDoc::Lawyer)
+      expect(@lawyers.keys.sort)
+        .to eq(%i[cjh dclarke ded jclarke mcrisp rjones tfarrell])
     end
 
     it 'should resolve cross references' do
-      expect(@hsh[:erickson].name).to eq('Erickson Incorporated')
+      expect(@people[:erickson].name).to eq('Erickson Incorporated')
+      expect(@lawyers[:ded].last).to eq('Doherty')
     end
 
-    it 'should instantiate all objects' do
+    it 'should instantiate all persons' do
       klasses = { persons: 'LawDoc::Person' }
+      klasses.each_pair do |sym, kls|
+        Ydl[sym].each_pair do |_nm, obj|
+          expect(obj.class.name).to eq(kls)
+        end
+      end
+    end
+
+    it 'should instantiate all lawyers' do
+      klasses = { lawyers: 'LawDoc::Lawyer' }
       klasses.each_pair do |sym, kls|
         Ydl[sym].each_pair do |_nm, obj|
           expect(obj.class.name).to eq(kls)
@@ -123,6 +140,8 @@ RSpec.describe Ydl do
     it 'should allow access through []' do
       expect(Ydl.data[:persons].class).to eq(Hash)
       expect(Ydl[:persons].class).to eq(Hash)
+      expect(Ydl.data[:lawyers].class).to eq(Hash)
+      expect(Ydl[:lawyers].class).to eq(Hash)
     end
   end
 
