@@ -99,17 +99,20 @@ If, when the files are read in, there is a class whose name is the camelized and
 singularized version of a hash key, and if the value of that key is itself a
 hash, an instance of the class is initialized using the hash values as
 initializers. So if there is a class defined whose last component is Person, the
-contents of the file ~'person.ydl'~ will instantiate objects of that class. This
+contents of the file ~person.ydl~ will instantiate objects of that class. This
 process is recursive, so values that are hashes with keys matching class names
 are instantiated as well. If there is more than one such class, an exception is
-raised. You can restrict the classes searched for by setting the ~class_prefix~
-config setting to a string or a list of strings of class prefixes to be
-consulted. If ~class_prefix~ is set to 'Company::Engineers', only the class
-~Company::Engineers::Person~ will be instantiated.
+raised.
+
+You can restrict the classes searched for by setting the ~class_modules~ config
+setting to a string or a list of strings of class prefixes to be consulted. If
+~class_modules~ is set to 'Company::Engineers', only the class
+~Company::Engineers::Person~ will be instantiated for objects under the
+~:persons~ hierarchy.  By default all modules will be consulted.
 
 In order for this to work, the initialize method for the classes must be able to
-take a Hash as an argument to ~.new~.  A different initializer method can be
-specified for each class in the configuration file.
+take a Hash as an argument to ~.new~. A different initializer method can be
+specified for each class with the ~class_init~ option in the configuration file.
 
 If no class is found, the item is left as a Hash.
 
@@ -118,12 +121,15 @@ If no class is found, the item is left as a Hash.
 String values can have the form ~ydl:/person/smith/address/city~, that is, the
 'ydl:' specifier followed by a "data path", much like a file name path, will,
 upon resolution, look up the value of the given item and return it as the value
-of that element.  Resolution of ~ydl:~ elements is deferred until all files have
-been read in so that forward references are possible.
+of that element. Resolution of ~ydl:~ elements is deferred until all files have
+been read in so that forward references are possible. However, ~Ydl~ will not
+look outside the files being loaded to find a cross-reference, so if you
+selectively load files, you may not be able to resolve some cross-references.
+Circular cross-references raise a ~Ydl::CircularReference~ error.
 
 *** Configuration
 
-Ydl looks for a configuration file in ~/.ydl/config.yaml.  Here is a sample
+Ydl looks for a configuration file in ~\~/.ydl/config.yaml~.  Here is a sample
 configuration that explains the options available:
 
 #+BEGIN_EXAMPLE
