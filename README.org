@@ -1,16 +1,22 @@
 * Ydl
 
-Ydl is meant to provide a way of supplying a ruby app with a set of initialized
-data structures for use in an application by allowing the user to supply
-persistent data in a series of "data definition files" with the extension ~.ydl~
-and containing the data in YAML format.
+Ydl provides a way to supply a ruby app with initialized data by allowing the
+user to supply the data in a hierarchical series of "data definition files" with
+the extension ~.ydl~. After issuing a load command, you can access all the data
+described by the ~.ydl~ files from a hierarchical "tree" of nested hashes whose
+root is returned by the load functions. The ~.ydl~ files are in YAML format,
+with a couple of twists. One twist is that you can use cross-references of the
+form ~ydl:/path/to/other/node~ to set the value of one node to its value at
+another place in the data hierarchy. The second twist is that nodes having names
+of classes that you specify in your config are automatically instantiated into
+objects and made available in the ~ydl~ data tree.
 
 ** Installation
 
 Add this line to your application's Gemfile:
 
 #+BEGIN_SRC ruby
-gem 'ydl'
+  gem 'ydl'
 #+END_SRC
 
 And then execute:
@@ -27,67 +33,79 @@ Or install it yourself as:
 
 ** Usage
 
-Ydl allows you to build a Hash containing all the items defined in the data
-definition files:
+Ydl allows you to build a Hash, available as ~Ydl.data~, containing all the
+items defined in the data definition files:
 
 #+BEGIN_SRC ruby
   require 'ydl'
 
-  data = Ydl.load_all
-  data.class     #=> Hash
-  data[:persons] #=> { ded: {....}, tyh: {....} }
+  Ydl.load
+  Ydl.data.class     #=> Hash
+  Ydl.data[:persons] #=> { joe: {....}, mary: {....} }
+  Ydl.data[:lawyers] #=> { anne: {....}, will: {....} }
 #+END_SRC
 
-You can load only files with a given base name:
+You can load only files with a given base name.  ~Ydl.load~ then returns a Hash
+just of the objects from files with the given base name, but also adds them to
+the global ~Ydl.data~ variable as well.
 
 #+BEGIN_SRC ruby
   require 'ydl'
 
-  people = Ydl.load('person')
+  people = Ydl.load('persons')
   people.class        #=> Hash
-  people              #=> { ded: {....}, tyh: {....} }
-  people[:ded].class  #=> Person
+  people              #=> { joe: {....}, mary: {....} }
+  people[:joe].class  #=> Person
+  Ydl.data[:persons][:joe].class  #=> Person
+
+  lawyers = Ydl.load('lawyers')
+  lawyers.class        #=> Hash
+  lawyers              #=> { will: {....}, anne: {....} }
+  lawyers[:will].class  #=> Lawyer
+  Ydl.data[:lawyers][:will].class  #=> Lawyer
 #+END_SRC
 
 *** Data Definition Files
 
-The data definition files have the extension ~.ydl~ and can occur in the
+The data definition files have the extension ~.ydl~ and are read from the
 following places:
 
-- in a system wide directory that is by default, ~/etc/ydl~, including all its
+- from a system wide directory that is by default, ~/etc/ydl~, including all its
   subdirectories,
-- in a user-specific directory in the user's HOME directory that is by default,
-  =~/ydl=, including all its subdirectories,
+- from a user-specific directory in the user's HOME directory that is by
+  default, =~/.ydl=, including all its subdirectories,
 - in the current working directory and all directories above the current
-  directory up to the user's home directory
+  directory up to the user's home directory or the root directory, whichever it
+  hits first.
 
-The data definitions are read in the same order as given above, except that the
+The data definitions are read in the same order given above, except that the
 third category reads files in the HOME directory first, then in each directory
-from there to the current directory in order.  In other words, directories
-closer to the current directory take priority over those higher up in the
-directory hierarchy.
+from there to the current directory in order. In other words, directories closer
+to the current directory take priority over those higher up in the directory
+hierarchy.
 
-In each case, all files with the extension '.ydl' are read and /only/ those files.
-Definitions in files read later are merged into those read earlier, overwriting
-any data having the same key or appending to array data having the same key.
+In each case, all files with the extension '.ydl' are read and /only/ those
+files. Definitions in files read later are merged into those read earlier,
+overwriting any data having the same key or appending to array data having the
+same key.
 
 The base name of each file is used as an outer key for the contents of the file.
-For example, a file ~'person.ydl'~ in the current directory will be treated as
-the value of a Hash with the key 'person'.
+For example, a file ~'persons.ydl'~ in the current directory will be treated as
+the value of a Hash with the key ~:persons~.
 
 *** Automatic Instantiation of Classes
 
-If, at the time the files are read in, there is a class whose name is the
-camelized and singularized version of a hash key, and if the value of that key
-is itself a hash, an instance of the class is initialized using the hash values
-as initializers. So if there is a class defined whose last component is Person,
-the contents of the file ~'person.ydl'~ will instantiate objects of that class.
-This process is recursive, so values that are hashes with keys matching class
-names are instantiated as well. If there is more than one such class, an
-exception is raised. You can restrict the classes searched for by setting the
-~class_prefix~ config setting to a string or a list of strings of class prefixes
-to be consulted. If ~class_prefix~ is set to 'Company::Engineers', only the
-class ~Company::Engineers::Person~ will be instantiated.
+If, when the files are read in, there is a class whose name is the camelized and
+singularized version of a hash key, and if the value of that key is itself a
+hash, an instance of the class is initialized using the hash values as
+initializers. So if there is a class defined whose last component is Person, the
+contents of the file ~'person.ydl'~ will instantiate objects of that class. This
+process is recursive, so values that are hashes with keys matching class names
+are instantiated as well. If there is more than one such class, an exception is
+raised. You can restrict the classes searched for by setting the ~class_prefix~
+config setting to a string or a list of strings of class prefixes to be
+consulted. If ~class_prefix~ is set to 'Company::Engineers', only the class
+~Company::Engineers::Person~ will be instantiated.
 
 In order for this to work, the initialize method for the classes must be able to
 take a Hash as an argument to ~.new~.  A different initializer method can be
@@ -102,6 +120,53 @@ String values can have the form ~ydl:/person/smith/address/city~, that is, the
 upon resolution, look up the value of the given item and return it as the value
 of that element.  Resolution of ~ydl:~ elements is deferred until all files have
 been read in so that forward references are possible.
+
+*** Configuration
+
+Ydl looks for a configuration file in ~/.ydl/config.yaml.  Here is a sample
+configuration that explains the options available:
+
+#+BEGIN_EXAMPLE
+# You can set the system-wide ydl directory here; otherwise it defaults to
+# /usr/local/share/ydl.
+
+# system_ydl_dir: /usr/local/share/ydl
+
+# For automatic instantiation, search for classes prefixed by the given modules
+# in the order given. For example, if the key 'breed' is to be instantiated, you
+# can restrict the search for classes named 'Breed' only in modules, 'Dog' and
+# 'Cat' with this:
+#
+#   class_modules:
+#     - Dog
+#     - Cat
+#
+# then, only Dog::Breed and Cat::Breed will be searched for an existing breed
+# class. Otherwise, any class ending in Breed could be used, and they will be
+# searched in alphabetical order, and the first found will be used.
+#
+# A blank value means to consider classes in the main, global module level. You
+# can always disambiguate the class selected with the class_map option below.
+
+class_modules:
+  -
+  - LawDoc
+  - Company::Employee
+
+# By default, each key will be camelized and singularized to find the matching
+# class. So, the key 'dogs' will look for a class named 'Dog', and 'dog_faces'
+# will look for a class 'DogFace'. You can override this heuristic here by
+# saying exactly which class a given key should map to.
+class_map:
+  address: LawDoc::Address
+  persons: LawDoc::Person
+  fax: LawDoc::Phone
+
+# Specify constructors for classes whose .new method will not take a Hash as an
+# argument to initialize the class.
+class_init:
+  LawDoc::Person: from_hash
+#+END_EXAMPLE
 
 ** Development
 
