@@ -94,6 +94,7 @@ RSpec.describe Ydl do
     end
   end
 
+
   describe 'load' do
     before :all do
       @hsh = Ydl.load
@@ -108,7 +109,9 @@ RSpec.describe Ydl do
     end
 
     it 'should resolve cross references' do
-      expect(Ydl[:cases][:erickson].parties.first.lawyers.first.last).to eq('Doherty')
+      expect(Ydl[:cases][:erickson].parties.first.lawyers.first.last)
+        .to eq('Doherty')
+    end
 
     it 'should instantiate all objects' do
       klasses = { cases: 'LawDoc::Case', courts: 'LawDoc::Court',
