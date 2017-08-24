@@ -68,6 +68,7 @@ module Ydl
 
   # Return the component at key from Ydl.data.
   def self.[](key)
+    raise UserError, "no key '#{key}' in Ydl data" unless self.data.keys.include?(key)
     Ydl.data[key]
   end
 
