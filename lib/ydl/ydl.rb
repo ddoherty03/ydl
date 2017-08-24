@@ -182,10 +182,10 @@ module Ydl
     cfg_file = ENV['YDL_CONFIG_FILE'] || CONFIG_FILE
     cfg_file = File.expand_path(cfg_file)
     Ydl.config ||= {}
-    Ydl.config[:class_map] ||= {}
-    Ydl.config[:class_init] ||= {}
     Ydl.config = YAML.load_file(cfg_file) if File.exist?(cfg_file)
     Ydl.config.deep_symbolize_keys!
+    Ydl.config[:class_map] ||= {}
+    Ydl.config[:class_init] ||= {}
     Ydl.config[:system_ydl_dir] ||= SYSTEM_DIR
     Ydl.config
   end
