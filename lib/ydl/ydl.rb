@@ -61,7 +61,7 @@ module Ydl
   def self.load_file(name)
     key = File.basename(name, '.ydl').to_sym
     result = {}
-    result[key] = Psych.load_file(name)
+    result[key] = Psych.load_file(name, {})
     result[key].deep_symbolize_keys! if result[key].is_a?(Hash)
     result
   end
