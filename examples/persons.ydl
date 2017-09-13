@@ -1,0 +1,10 @@
+erickson:
+  name: Erickson Incorporated
+  address:
+    street:
+      - c/o The Corporation Trust Company
+      - Corporation Trust Center
+      - 1209 Orange St.
+    city: Wilmington
+    state: DE
+    zip: 19801

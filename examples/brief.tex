@@ -1,0 +1,46 @@
+\documentclass[sign]{lawdoc}
+
+{: require 'law_doc' :}
+
+{:=
+LawDoc.document do
+  title 'Brief in Support of Plaintiff\'s Motion for Summary Judgment'
+  kase Ydl[:cases][:erickson]
+  on_behalf_of 'plaintiffs'
+  signers Ydl[:lawyers][:ded], Ydl[:lawyers][:cjh]
+  sig_date '2015-11-20'
+  server signer
+  service_date sig_date
+end
+:}
+
+%\geometry{showframe}
+\begin{document}
+  \maketitlepage
+
+  \makefullcaption
+
+  \makecaption
+
+  \begin{center}
+    \textbf{Our Lawyers}
+  \end{center}
+  \makeourlawyersblock
+
+  \begin{center}
+    \textbf{Their Lawyers}
+  \end{center}
+  \maketheirlawyersblock
+
+  \begin{center}
+    \textbf{Full Signature}
+  \end{center}
+  \makefullsignature
+
+  \begin{center}
+    \textbf{Signature}
+  \end{center}
+  \makesignature
+
+  \makecertificateofservice
+\end{document}

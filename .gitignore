@@ -13,3 +13,9 @@
 /GPATH
 /GRTAGS
 /GTAGS
+*synctex.gz
+examples/*.idx
+examples/*.ilg
+examples/*.ind
+examples/*.pdf
+examples/_region_*

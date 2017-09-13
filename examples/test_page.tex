@@ -1,0 +1,76 @@
+\documentclass{article}
+
+\usepackage{setspace}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{yfonts}
+\usepackage{calc}
+\usepackage[showframe]{geometry}
+
+\begin{document}
+
+\setlength\extrarowheight{12pt}%
+\newlength{\ldhalfwd}
+\setlength{\ldhalfwd}{((\textwidth) * \real{0.95} - \columnsep)/2}%
+
+\def\ol{%
+%\begin{small}
+  \begin{longtable}{p{\ldhalfwd}p{\ldhalfwd}}%
+    \parbox[t]{\ldhalfwd}{
+      \textsc{Daniel E. Doherty}\\
+Commerce Plaza I\\
+7300 W. 110th Street, Suite 930\\
+Overland Park, KS 66210\\
+\textbf{Phone:} 913-338-7182\\
+\textbf{Fax:} 913-338-7164\\
+\textbf{Email:} \texttt{ded-law@ddoherty.net}\\
+Attorney for Lisa A. Gibbons and Revive Investing LLC
+    }&
+    \parbox[t]{\ldhalfwd}{
+      \textsc{Charles J. Hyland}\\
+Commerce Plaza I\\
+7300 W. 110th Street, Suite 930\\
+Overland Park, KS 66210\\
+\textsc{Hyland Law Firm LLC}\\
+\textbf{Phone:} 913-498-1911\\
+\textbf{Fax:} 913-498-1950\\
+\textbf{Email:} \texttt{charlie@hylandkc.com}\\
+Attorney for Lisa A. Gibbons and Revive Investing LLC
+    }\\
+  \end{longtable}
+%\end{small}
+}
+
+  \thispagestyle{empty}
+  \setcounter{page}{-1}
+  {PreCaption}
+  \begin{center}
+    \hrule
+    \vspace{10pt}
+    \vfil
+    {\Large\gothfamily In th{e}\\
+      {\LARGE ForumName:}}
+    \vfil
+    \hrule
+    \vfil
+    LeftCaptionBlock
+    \vfil
+    \hrule
+    \vfil
+    \textbf{OriginatingCourt}
+    \vfil
+    \hrule
+    \vfil
+    \textsc{\bfseries DocTitle}
+    \vfil
+    \hrule
+    \vfil
+    \begin{singlespace}
+      \mbox{\ol}
+    \end{singlespace}
+    \vfil
+    \vspace{10pt}
+    \hrule
+  \end{center}
+  \clearpage
+\end{document}

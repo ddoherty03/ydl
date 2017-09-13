@@ -1,0 +1,79 @@
+erickson:
+  court: ydl:/courts/sdny
+  judge: ydl:/judges/forrest
+  number: 14-CV-09061
+  parties:
+    -
+      person: ydl:/persons/lag
+      role: Plaintiff
+      lawyer:
+        - ydl:/lawyers/ded
+        - ydl:/lawyers/cjh
+    -
+      person: ydl:/persons/revive
+      role: Plaintiff
+      lawyer:
+        - ydl:/lawyers/ded
+        - ydl:/lawyers/cjh
+    -
+      person: ydl:/persons/erickson
+      role: Nominal Defendant
+      lawyers:
+        - ydl:/lawyers/dclarke
+        - ydl:/lawyers/jclarke
+    -
+      name: Quinn Morgan
+      role: Defendant
+      address:
+        street:
+          - 60 East 42nd Street
+          - Suite 1400
+        city: New York
+        state: NY
+        zip: 10165
+      lawyers:
+        - ydl:/lawyers/rjones
+        - ydl:/lawyers/mcrisp
+        - ydl:/lawyers/tfarrell
+    -
+      name: ZM Private Equity Fund I
+      role: Defendant
+      address:
+        street:
+          - c/o Corporation Service Company
+          - 2711 Centerville Rd, Suite 400
+        city: Wilmington
+        state: DE
+        zip: 19808
+      lawyers:
+        - ydl:/lawyers/rjones
+        - ydl:/lawyers/mcrisp
+        - ydl:/lawyers/tfarrell
+    -
+      name: ZM Private Equity Fund II
+      role: Defendant
+      address:
+        street:
+          - c/o Corporation Service Company
+          - 2711 Centerville Rd, Suite 400
+        city: Wilmington
+        state: DE
+        zip: 19808
+      lawyers:
+        - ydl:/lawyers/rjones
+        - ydl:/lawyers/mcrisp
+        - ydl:/lawyers/tfarrell
+    -
+      name: ZM EAC LLC
+      role: Defendant
+      address:
+        street:
+          - 60 East 42nd Street
+          - Suite 1400
+        city: New York
+        state: NY
+        zip: 10165
+      lawyers:
+        - ydl:/lawyers/rjones
+        - ydl:/lawyers/mcrisp
+        - ydl:/lawyers/tfarrell

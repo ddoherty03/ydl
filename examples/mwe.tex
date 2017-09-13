@@ -1,0 +1,67 @@
+\documentclass{article}
+
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{calc}
+
+\begin{document}
+
+% A bit less than half the page width
+\newlength{\halfwd}
+\setlength{\halfwd}{((\textwidth) * \real{0.95} - \columnsep)/2}%
+
+% A longtable that I want as one of the page components
+\def\lt{%
+  \setlength\extrarowheight{12pt}%
+  \begin{longtable}{cc}%
+    \parbox[t]{\halfwd}{%
+    11111111111111111\\
+    11111111111111111111\\
+    11111111111111111111}&
+    \parbox[t]{\halfwd}{22222222222222222222\\
+    22222222222222222\\
+    22222222222222222222}\\
+
+    \parbox[t]{\halfwd}{33333333333333333333\\
+    33333333333333333333\\
+    33333333333333333333}&
+    \parbox[t]{\halfwd}{44444444444444444444\\
+    44444444444444444444\\
+    44444444444444444444}\\
+
+    \parbox[t]{\halfwd}{55555555555555555555\\
+    55555555555555555555\\
+    55555555555555555555}&
+    \parbox[t]{\halfwd}{66666666666666666666\\
+    66666666666666666666\\
+    66666666666666666666}\\
+  \end{longtable}
+}
+
+% I expect each part of the page to be equally spaced and all the parts together
+% to fill up the whole page.
+  \begin{center}
+    \hrule
+    Part I
+
+    \vfill
+    \hrule
+    \vfill
+    Part II
+
+    \vfill
+    \hrule
+    \vfill
+
+    Part III
+
+    {\ttfamily \lt}
+    \vfill
+    \hrule
+    \vfill
+    Part IV
+
+    \vfill
+    \hrule
+  \end{center}
+\end{document}
