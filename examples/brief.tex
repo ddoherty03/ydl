@@ -14,7 +14,8 @@ LawDoc.document do
 end
 :}
 
-%\geometry{showframe}
+\overfullrule=10pt
+\geometry{showframe}
 \begin{document}
   \maketitlepage
 
@@ -22,24 +23,20 @@ end
 
   \makecaption
 
-  \begin{center}
-    \textbf{Our Lawyers}
-  \end{center}
+  \section{Our Lawyers}
+
   \makeourlawyersblock
 
-  \begin{center}
-    \textbf{Their Lawyers}
-  \end{center}
+  \section{Their Lawyers}
+
   \maketheirlawyersblock
 
-  \begin{center}
-    \textbf{Full Signature}
-  \end{center}
+  \section{Full Signature}
+
   \makefullsignature
 
-  \begin{center}
-    \textbf{Signature}
-  \end{center}
+  \section{Signature}
+
   \makesignature
 
   \makecertificateofservice
