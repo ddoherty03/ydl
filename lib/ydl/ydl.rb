@@ -5,8 +5,8 @@ require 'active_support/core_ext/hash/keys'
 # For singularize, camelize
 require 'active_support/core_ext/string'
 
+# Name-space module for the ydl gem.
 module Ydl
-
   using ArrayRefinements
 
   SYSTEM_DIR = '/usr/local/share/ydl'.freeze
@@ -68,7 +68,8 @@ module Ydl
 
   # Return the component at key from Ydl.data.
   def self.[](key)
-    raise UserError, "no key '#{key}' in Ydl data" unless self.data.keys.include?(key)
+    msg = "no key '#{key}' in Ydl data"
+    raise UserError, msg unless data.keys.include?(key)
     Ydl.data[key]
   end
 
