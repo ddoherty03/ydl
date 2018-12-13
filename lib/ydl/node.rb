@@ -4,13 +4,20 @@ module Ydl
     attr_reader :path, :root_id, :val, :children, :klass, :referee
 
     def initialize(path, val, klass = nil, root_id:)
+      # The path is an array of symbols representing the series of references
+      # taken from the root of the tree to this Node.
       @path = path
+      # The Object id for the root Node of the tree of which this Node is a part.
       @root_id = root_id
+      # The class into which this Node should be instantiated.
       @klass = klass
+      # The uninterpreted value for this Node, which when instantiated, will be
+      # an instance of klass.
       @val = val
       # Child Nodes; always a Hash, but keys may be numeric symbols, such a
-      # :'1', :'88', etc, where an array-like structure is wanted.
+      # :'1', :'88', etc, where an sequential array-like structure is wanted.
       @children = {}
+      # Has this Node resolved any cross-references in val yet?
       @resolved = false
       @referee = nil
       @depends_on = []
@@ -24,11 +31,13 @@ module Ydl
       ObjectSpace._id2ref(root_id)
     end
 
+    # Query whether this node is resolved, that is, does it contain a string
+    # reference to another part of the tree to which this Node belongs.
     def resolved?
       @resolved
     end
 
-    # The key for this Node.
+    # Query the key for this Node.
     def key
       path.last
     end

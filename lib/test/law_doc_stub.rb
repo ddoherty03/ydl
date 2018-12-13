@@ -1,6 +1,7 @@
 # This module defines stub classes for testing the instantiation methods of Ydl.
 # They are not part of the application.
 module LawDoc
+  # Stub class to represent a generic person, natural or juridical.
   class Person
     attr_reader :sex, :hon, :first, :middle, :last, :name
     attr_reader :address, :phone, :fax, :email

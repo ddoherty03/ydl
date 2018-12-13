@@ -49,7 +49,7 @@ module Ydl
     self.data = data.merge(tree)
 
     # Just return the base name's branch if base is set
-    if data.keys.include?(base.to_sym)
+    if data.key?(base.to_sym)
       data[base.to_sym]
     else
       data
@@ -69,7 +69,8 @@ module Ydl
   # Return the component at key from Ydl.data.
   def self.[](key)
     msg = "no key '#{key}' in Ydl data"
-    raise UserError, msg unless data.keys.include?(key)
+    raise UserError, msg unless data.key?(key)
+
     Ydl.data[key]
   end
 
@@ -109,6 +110,7 @@ module Ydl
   def self.filter_ignores(names, ignores)
     ignores = [ignores] unless ignores.is_a?(Array)
     return names if ignores.empty?
+
     result = names
     ignores.each do |ign|
       names.each do |nm|
@@ -129,8 +131,10 @@ module Ydl
     return nil if key.blank?
     return class_for_cache[key] if class_for_cache[key]
     return class_map(key) if class_map(key)
+
     klasses = candidate_classes(key, Ydl.config[:class_modules])
     return nil if klasses.empty?
+
     class_for_cache[key] = klasses.first
     klasses.first
   end
@@ -138,16 +142,18 @@ module Ydl
   def self.class_map(key)
     return nil if key.blank?
     return nil if key.is_a?(Numeric)
-    return nil unless Ydl.config[:class_map].keys.include?(key.to_sym)
-    klass_name = Ydl.config[:class_map][key.to_sym]
+    return nil unless Ydl.config[:class_map].key?(key.to_sym)
+
+    klass_name = config[:class_map][key.to_sym]
     klass_name.constantize
   rescue NameError
     raise "no declared class named '#{klass_name}'"
   end
 
   def self.class_init(klass_name)
-    return :new unless Ydl.config[:class_init].keys.include?(klass_name.to_sym)
-    Ydl.config[:class_init][klass_name.to_sym].to_sym
+    return :new unless config[:class_init].key?(klass_name.to_sym)
+
+    config[:class_init][klass_name.to_sym].to_sym
   end
 
   mattr_accessor :all_classes
@@ -182,12 +188,12 @@ module Ydl
   def self.read_config
     cfg_file = ENV['YDL_CONFIG_FILE'] || CONFIG_FILE
     cfg_file = File.expand_path(cfg_file)
-    Ydl.config ||= {}
-    Ydl.config = YAML.load_file(cfg_file) if File.exist?(cfg_file)
-    Ydl.config.deep_symbolize_keys!
-    Ydl.config[:class_map] ||= {}
-    Ydl.config[:class_init] ||= {}
-    Ydl.config[:system_ydl_dir] ||= SYSTEM_DIR
-    Ydl.config
+    config ||= {}
+    config = YAML.load_file(cfg_file) if File.exist?(cfg_file)
+    config.deep_symbolize_keys!
+    config[:class_map] ||= {}
+    config[:class_init] ||= {}
+    config[:system_ydl_dir] ||= SYSTEM_DIR
+    config
   end
 end
