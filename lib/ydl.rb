@@ -1,3 +1,4 @@
+require 'active_support'
 require 'psych'
 require 'yaml'
 require 'fat_core'
