@@ -49,8 +49,9 @@ module Ydl
     self.data = data.merge(tree)
 
     # Just return the base name's branch if base is set
-    if data.key?(base.to_sym)
-      data[base.to_sym]
+    base = base.to_sym
+    if data.key?(base)
+      data[base]
     else
       data
     end
@@ -142,18 +143,22 @@ module Ydl
   def self.class_map(key)
     return nil if key.blank?
     return nil if key.is_a?(Numeric)
-    return nil unless Ydl.config[:class_map].key?(key.to_sym)
 
-    klass_name = config[:class_map][key.to_sym]
+    key = key.to_sym
+    return nil unless Ydl.config[:class_map].key?(key)
+
+    klass_name = config[:class_map][key]
     klass_name.constantize
   rescue NameError
     raise "no declared class named '#{klass_name}'"
   end
 
   def self.class_init(klass_name)
-    return :new unless config[:class_init].key?(klass_name.to_sym)
+    klass_name = klass_name.to_sym
+    klass_config = config[:class_init]
+    return :new unless klass_config.key?(klass_name)
 
-    config[:class_init][klass_name.to_sym].to_sym
+    klass_config[klass_name].to_sym
   end
 
   mattr_accessor :all_classes
@@ -164,8 +169,8 @@ module Ydl
     all_classes ||=
       ObjectSpace.each_object(Class)
         .map(&:to_s)
-        .select { |c| c =~ /^[A-Z]/ }
-        .reject { |c| c =~ /^Errno::/ }
+        .select { |klass| klass =~ /^[A-Z]/ }
+        .reject { |klass| klass =~ /^Errno::/ }
 
     suffix = key.to_s.singularize.camelize
     modules = modules.split(',').map(&:clean) if modules.is_a?(String)
@@ -173,8 +178,8 @@ module Ydl
       if modules
         # If modules given, restrict to those classes within the modules, where
         # a blank string is the main module.
-        modules.any? do |m|
-          cls =~ (m.blank? ? /\A#{suffix}\z/ : /\A#{m}::#{suffix}\z/)
+        modules.any? do |mod|
+          cls =~ (mod.blank? ? /\A#{suffix}\z/ : /\A#{mod}::#{suffix}\z/)
         end
       else
         # Otherwise, all classes ending with suffix.
