@@ -81,8 +81,11 @@ module Ydl
   # against the basename without the .ydl extension).
   def self.ydl_files(glob: '*', ignore: nil)
     read_config
+    sys_ydl_dir = Ydl.config[:system_ydl_dir] || '/etc/ydl'
     file_names = []
-    file_names += Dir.glob("#{Ydl.config[:system_ydl_dir]}/**/#{glob}.ydl")
+    unless sys_ydl_dir.blank?
+      file_names += Dir.glob("#{sys_ydl_dir}/**/#{glob}.ydl")
+    end
     file_names += Dir.glob(File.join(ENV['HOME'], ".ydl/**/#{glob}.ydl"))
 
     # Find directories from pwd to home (or root), then reverse
