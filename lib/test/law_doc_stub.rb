@@ -20,6 +20,7 @@ module LawDoc
       @sex ||= sex.clean.downcase
       msg = "invalid sex: '#{@sex}'"
       raise ArgumentError, msg unless %w[entity male female].include?(@sex)
+
       @hon = hon
       @first = first
       @middle = middle
@@ -27,6 +28,7 @@ module LawDoc
       @suffix = suffix
       msg = 'set name only for entities; use name components otherwise'
       raise ArgumentError, msg if name && @sex != 'entity'
+
       @address = init_address(address)
       @phone = init_phone(phone)
       @fax = init_phone(fax, field: 'fax')

@@ -187,7 +187,7 @@ module Ydl
 
     private
 
-    # Return an object of class klass if one can be initialized with the Hash
+    # Return an object of class @klass if one can be initialized with the Hash
     # val or the current Node converted to a params hash.
     def instantiate
       return nil if klass.blank?
