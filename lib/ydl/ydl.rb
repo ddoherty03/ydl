@@ -19,7 +19,7 @@ module Ydl
     # Holder of all the data read from the .ydl files as a Hash
     attr_accessor :data
   end
-  self.config = {}
+  self.config = { class_map: {}, class_init: {} }
   self.data = {}
 
   # Load all .ydl files, subject to the given options.  After loading, the data
