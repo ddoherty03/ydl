@@ -1,4 +1,8 @@
 module Ydl
+  # The Tree class holds the data read from the .ydl files while any
+  # cross-references are being resolved and objects are being instantiated.
+  # After all that work is done, its nodes are merged into the main Ydl.data
+  # hash to be referenced by the application.
   class Tree
     # A Queue of unresolved Nodes as a Hash keyed by the path to the dependent
     # nodes with a value of the nodes on which that node depends.
@@ -17,6 +21,7 @@ module Ydl
 
     def [](key)
       return nil unless @root.key?(key)
+
       @root[key]
     end
 
@@ -53,7 +58,7 @@ module Ydl
           xref = Tree.path_to_xref(path)
           pxref = Tree.path_to_xref(partial_path)
           klass = node.klass
-          msg = "cannot resolve xref '#{xref}' beyond #{klass} object '#{pxref}'"
+          msg = "can\'t resolve '#{xref}' beyond #{klass} object '#{pxref}'"
           raise Ydl::BadXRef, msg
         end
         partial_path << key
@@ -67,6 +72,7 @@ module Ydl
     def self.xref_to_path(str)
       match = str.to_s.clean.match(%r{\Aydl:/(?<path_str>.*)\z})
       return nil unless match
+
       match[:path_str].split('/').map(&:to_sym)
     end
 

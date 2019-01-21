@@ -10,18 +10,17 @@ module Ydl
 
     def add_dependency(dependent, depends_on)
       @dependencies[dependent] ||= []
-      case depends_on
-      when Array
-        @dependencies[dependent] += depends_on
-      else
-        @dependencies[dependent] += [depends_on]
-      end
-      # Add an empty dependency for all the depends_on members; the TSort module
-      # expects this to indicate that the ref depends on nothing else.
-      depends_on.each do |ref|
-        unless @dependencies.key?(ref)
-          @dependencies[ref] = []
+      @dependencies[dependent] +=
+        case depends_on
+        when Array
+          depends_on
+        else
+          [depends_on]
         end
+      # Add an empty dependency for all the depends_on members; the TSort
+      # module expects this to indicate that the ref depends on nothing else.
+      depends_on.each do |ref|
+        @dependencies[ref] = [] unless @dependencies.key?(ref)
       end
       self
     end

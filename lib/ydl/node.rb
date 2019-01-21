@@ -7,12 +7,13 @@ module Ydl
       # The path is an array of symbols representing the series of references
       # taken from the root of the tree to this Node.
       @path = path
-      # The Object id for the root Node of the tree of which this Node is a part.
+      # The Object id for the root Node of the tree of which this Node is a
+      # part.
       @root_id = root_id
       # The class into which this Node should be instantiated.
       @klass = klass
-      # The uninterpreted value for this Node, which when instantiated, will be
-      # an instance of klass.
+      # The uninterpreted value for this Node, which when instantiated, will
+      # be an instance of klass.
       @val = val
       # Child Nodes; always a Hash, but keys may be numeric symbols, such a
       # :'1', :'88', etc, where an sequential array-like structure is wanted.
@@ -22,7 +23,6 @@ module Ydl
       @referee = nil
       @depends_on = []
       build
-      self
     end
 
     # Return a reference to the Ydl::Tree to which this Node belongs, in case we
@@ -55,6 +55,7 @@ module Ydl
     # Return the /val/ of child at key +key+ or nil if there is none
     def [](key)
       return nil if children.empty?
+
       key = key.to_s.to_sym if key.is_a?(Numeric)
       children[key]
     end
@@ -99,6 +100,16 @@ module Ydl
       result
     end
 
+    def instantiated?
+      return true if val.class == klass
+
+      result = false
+      unless children.empty?
+        result = children.values.all? { |n| n.val.class == n.klass }
+      end
+      result
+    end
+
     private
 
     # Build this node and the children subnodes of self and set this node's
@@ -136,7 +147,7 @@ module Ydl
         @children = {}
       when Hash
         has_xref = val.xref?
-        obj = (klass && !has_xref) ? instantiate : nil
+        obj = klass && !has_xref ? instantiate : nil
         if obj
           @val = obj
           @resolved = true
@@ -174,37 +185,26 @@ module Ydl
       self
     end
 
-    public
-
-    def instantiated?
-      return true if val.class == klass
-      result = false
-      unless children.empty?
-        result = children.values.all? { |n| n.val.class == n.klass }
-      end
-      result
-    end
-
-    private
-
     # Return an object of class @klass if one can be initialized with the Hash
     # val or the current Node converted to a params hash.
     def instantiate
       return nil if klass.blank?
       return val if instantiated?
+
       if val
         klass.send(konstructor, val)
       elsif resolved?
         klass.send(konstructor, to_params)
       end
     rescue ArgumentError
-      return nil
+      nil
     end
 
     # Return a symbol for the constructor method for klass: either :new or the
     # user-defined constructor from the config.
     def konstructor
       return nil if klass.blank?
+
       Ydl.class_init(klass.to_s)
     end
   end

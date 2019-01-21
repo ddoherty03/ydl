@@ -150,7 +150,7 @@ module Ydl
     key = key.to_sym
     return nil unless Ydl.config[:class_map].key?(key)
 
-    klass_name = config[:class_map][key]
+    klass_name = Ydl.config[:class_map][key]
     klass_name.constantize
   rescue NameError
     raise "no declared class named '#{klass_name}'"
@@ -158,7 +158,7 @@ module Ydl
 
   def self.class_init(klass_name)
     klass_name = klass_name.to_sym
-    klass_config = config[:class_init]
+    klass_config = Ydl.config[:class_init]
     return :new unless klass_config.key?(klass_name)
 
     klass_config[klass_name].to_sym
@@ -196,12 +196,12 @@ module Ydl
   def self.read_config
     cfg_file = ENV['YDL_CONFIG_FILE'] || CONFIG_FILE
     cfg_file = File.expand_path(cfg_file)
-    config ||= {}
-    config = YAML.load_file(cfg_file) if File.exist?(cfg_file)
-    config.deep_symbolize_keys!
-    config[:class_map] ||= {}
-    config[:class_init] ||= {}
-    config[:system_ydl_dir] ||= SYSTEM_DIR
-    config
+    Ydl.config ||= {}
+    Ydl.config = YAML.load_file(cfg_file) if File.exist?(cfg_file)
+    Ydl.config.deep_symbolize_keys!
+    Ydl.config[:class_map] ||= {}
+    Ydl.config[:class_init] ||= {}
+    Ydl.config[:system_ydl_dir] ||= SYSTEM_DIR
+    Ydl.config
   end
 end

@@ -48,15 +48,10 @@ RSpec.describe Ydl do
   describe 'class instantiation' do
     it 'should be able to find candidate classes within any module' do
       cnds = Ydl.candidate_classes(:set)
-      # expect(cnds.size).to eq(4)
+      expect(cnds.size).to be > 3
       expect(cnds).to include(Set)
       expect(cnds).to include(Psych::Set)
       expect(cnds).to include(RSpec::Core::Set)
-
-      # And in alphabetical order
-      expect(cnds[0]).to eq(Psych::Set)
-      expect(cnds[1]).to eq(RSpec::Core::Set)
-      expect(cnds[2]).to eq(Set)
     end
 
     it 'should be able to find candidate classes within modules as string' do
