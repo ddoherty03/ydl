@@ -4,17 +4,18 @@ Ydl provides a way to supply a ruby app with initialized data by allowing the
 user to supply the data in a hierarchical series of "data definition files" with
 the extension ~.ydl~. After issuing a load command, you can access all the data
 described by the ~.ydl~ files from a hierarchical "tree" of nested hashes whose
-root is returned by the load functions. The ~.ydl~ files are in YAML format,
-with a couple of twists. One twist is that you can use cross-references of the
-form ~ydl:/path/to/other/node~ to set the value of one node to its value at
-another place in the data hierarchy. The second twist is that nodes having names
-of classes that you specify in your config are automatically instantiated into
-objects and made available in the ~ydl~ data tree.
+root is returned by the load functions.
+
+The ~.ydl~ files are in YAML format, with a couple of twists. One twist is
+that you can use cross-references of the form ~ydl:/path/to/other/node~ to set
+the value of one node to its value at another place in the data hierarchy. The
+second twist is that nodes having names of classes that you specify in your
+config are automatically instantiated into objects and made available in the
+~ydl~ data tree.
 
 ** Installation
 
 Add this line to your application's Gemfile:
-
 #+BEGIN_SRC ruby
   gem 'ydl'
 #+END_SRC
@@ -129,8 +130,9 @@ Circular cross-references raise a ~Ydl::CircularReference~ error.
 
 *** Configuration
 
-Ydl looks for a configuration file in ~\~/.ydl/config.yaml~.  Here is a sample
-configuration that explains the options available:
+Ydl looks for a configuration file in ~.ydl/config.yaml~ of your ~HOME~
+directory.  Here is the sample configuration that explains the options
+available:
 
 #+BEGIN_EXAMPLE
 # You can set the system-wide ydl directory here; otherwise it defaults to
