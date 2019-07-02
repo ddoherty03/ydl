@@ -1,5 +1,6 @@
+# Extension of Array class.
 class Array
   def xref?
-    any?(&:xref?)
+    select { |v| v.is_a?(String) }.any?(&:xref?)
   end
 end

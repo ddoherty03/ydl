@@ -11,6 +11,6 @@ class String
   end
 
   def xref?
-    clean.match?(%r{\Aydl:/})
+    clean.match?(%r{\Aydl:/?})
   end
 end

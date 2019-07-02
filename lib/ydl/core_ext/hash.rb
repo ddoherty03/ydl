@@ -11,6 +11,6 @@ class Hash
   end
 
   def xref?
-    values.any?(&:xref?)
+    values.select { |v| v.is_a?(String)}.any?(&:xref?)
   end
 end

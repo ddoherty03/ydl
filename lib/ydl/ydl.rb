@@ -32,7 +32,7 @@ module Ydl
   # - ignore: /regexp/ :: ignore all .ydl files whose base name matches the
   #   given regexp.
   # - ignore: [String|/regexp/] :: ignore all .ydl files whose base name matches
-  #   any of the given strings or regexp's.
+  #   any of the given strings or regexp's in the given Array.
   #
   # @param [Hash] options selectively ignore files; use alternative config
   # @return [Hash] data read from .ydl files as a Hash
