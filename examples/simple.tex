@@ -1,8 +1,7 @@
-\documentclass[sign]{lawdoc}
-
-{: require 'law_doc' :}
+\documentclass{lawdoc}
 
 {:=
+require 'law_doc'
 LawDoc.document do
   title 'Brief in Support of Plaintiff\'s Motion for Summary Judgment'
   kase Ydl[:cases][:erickson]
@@ -14,30 +13,11 @@ LawDoc.document do
 end
 :}
 
-% \overfullrule=10pt
-% \geometry{showframe}
 \begin{document}
-  \maketitlepage
-
-  \makefullcaption
-
   \makecaption
-
-  \section{Our Lawyers}
-
-  \makeourlawyersblock
-
-  \section{Their Lawyers}
-
-  \maketheirlawyersblock
-
-  \section{Full Signature}
-
-  \makefullsignature
-
-  \section{Signature}
 
   \makesignature
 
+  \newpage
   \makecertificateofservice
 \end{document}

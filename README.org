@@ -119,14 +119,16 @@ If no class is found, the item is left as a Hash.
 
 *** Cross References
 
-String values can have the form ~ydl:/person/smith/address/city~, that is, the
-'ydl:' specifier followed by a "data path", much like a file name path, will,
-upon resolution, look up the value of the given item and return it as the value
-of that element. Resolution of ~ydl:~ elements is deferred until all files have
-been read in so that forward references are possible. However, ~Ydl~ will not
-look outside the files being loaded to find a cross-reference, so if you
-selectively load files, you may not be able to resolve some cross-references.
-Circular cross-references raise a ~Ydl::CircularReference~ error.
+String values can have the form ~ydl:/person/smith/address/city~ or
+~ydl:person/smith/address/city~ (the presence of the leading '/' is optional
+and has no meaning), that is, the 'ydl:' specifier followed by a "data path",
+much like a file name path, will, upon resolution, look up the value of the
+given item and return it as the value of that element. Resolution of ~ydl:~
+elements is deferred until all files have been read in so that forward
+references are possible. However, ~Ydl~ will not look outside the files being
+loaded to find a cross-reference, so if you selectively load files, you may
+not be able to resolve some cross-references.  Circular cross-references raise
+a ~Ydl::CircularReference~ error.
 
 *** Configuration
 
