@@ -1,5 +1,6 @@
 require 'tsort'
 
+# Extend Hash for use with TSort and add xref?.
 class Hash
   include TSort
 
