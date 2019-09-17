@@ -30,7 +30,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'psych'
-  spec.add_dependency 'fat_core', '~> 4.3.0'
+  spec.add_dependency 'fat_core'
   spec.add_dependency 'activesupport'
 
   spec.add_development_dependency 'bundler', '~> 1.14'
