@@ -1,17 +1,29 @@
 * Ydl
 
-Ydl provides a way to supply a ruby app with initialized data by allowing the
-user to supply the data in a hierarchical series of "data definition files"
-with the extension ~.ydl~. After calling ~Ydl.load~, you can access all the
-data described by the ~.ydl~ files from a hierarchical tree of nested hashes
-via the hash Ydl.data[<key] (or, more concisely, ~Ydl[<key]~).
+Ydl provides a way to supply a ruby app with initialized objects by allowing
+the user to supply the data about the objects in a hierarchical series of
+"data definition files" with the extension ~.ydl~. In particular, the ~ydl~
+command ~Ydl.load~ finds all files with the extension ~.ydl~ in the following
+locations and uses the data in them to instantiate ~Ruby~ objects:
+
+1. all ~.ydl~ files a configurable system-wide directory, by default ~/etc/ydl~
+2. all ~.ydl~ files in the user's directory ~/home/user/.ydl~ and all
+   directories under that directory, recursively, and
+3. all ~.ydl~ files in each directory starting at the user's home directory
+   (or the root directory if the current directory is not directly or
+   indirectly underneath the user's home directory) and continuing to the
+   current working directory,
+
+After calling ~Ydl.load~, you can access all the objects described by the
+~.ydl~ files from a hierarchical tree of nested hashes via the global hash
+Ydl.data[<key] (or, more concisely, ~Ydl[<key]~).
 
 The ~.ydl~ files are in YAML format, with a couple of twists. One twist is
 that you can use cross-references of the form ~ydl:/path/to/other/node~ to set
 the value of one node to its value at another place in the data hierarchy. The
 second twist is that nodes having names of classes that you specify in your
-config are automatically instantiated into Ruby objects and made available in
-the ~ydl~ data tree.
+config are automatically instantiated into Ruby objects of that class and made
+available in the ~ydl~ data tree.
 
 ** Installation
 
