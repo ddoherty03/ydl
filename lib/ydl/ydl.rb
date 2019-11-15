@@ -55,6 +55,9 @@ module Ydl
     else
       data
     end
+  rescue UserError, CircularReference, BadXref => e
+    $stderr.puts e
+    exit 1
   end
 
   # Return a Hash with a single key of the basename of the given file and a
@@ -62,7 +65,12 @@ module Ydl
   def self.load_file(name)
     key = File.basename(name, '.ydl').to_sym
     result = {}
-    result[key] = Psych.load_file(name, {})
+    begin
+      result[key] = Psych.load_file(name, {})
+    rescue Psych::SyntaxError => e
+      usr_msg = "#{File.expand_path(name)}: #{e.problem} #{e.context} at line #{e.line} column #{e.column}"
+      raise UserError, usr_msg
+    end
     result[key].deep_symbolize_keys! if result[key].is_a?(Hash)
     result
   end

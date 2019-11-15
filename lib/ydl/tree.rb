@@ -58,7 +58,7 @@ module Ydl
           xref = Tree.path_to_xref(path)
           pxref = Tree.path_to_xref(partial_path)
           klass = node.klass
-          msg = "can\'t resolve '#{xref}' beyond #{klass} object '#{pxref}'"
+          msg = "can\'t resolve cross-ref '#{xref}' beyond #{klass} object '#{pxref}'"
           raise Ydl::BadXRef, msg
         end
         partial_path << key

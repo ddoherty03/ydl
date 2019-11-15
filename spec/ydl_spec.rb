@@ -130,7 +130,7 @@ RSpec.describe Ydl do
       end
     end
 
-    it 'should allow access through []' do
+    it 'should allow access through Ydl[]' do
       expect(Ydl.data[:persons].class).to eq(Hash)
       expect(Ydl[:persons].class).to eq(Hash)
       expect(Ydl.data[:lawyers].class).to eq(Hash)

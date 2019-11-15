@@ -7,7 +7,9 @@ RSpec.describe Ydl do
 
   describe 'load ydl_file with errors' do
     it 'shows file where error occurred' do
-      Ydl.load_file('../../../../person_err.ydl')
+      expect {
+        Ydl.load_file('../../../../person_err.ydl')
+      }.to raise_error Ydl::UserError, /person_err.*line.*column/
     end
   end
 end
