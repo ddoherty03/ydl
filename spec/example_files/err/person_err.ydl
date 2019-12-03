@@ -1,0 +1,6 @@
+person:
+  name: Daniel E. Doherty
+  hobbies:
+    - ruby programming
+    + hello
+    - bicycling
