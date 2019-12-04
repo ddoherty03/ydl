@@ -26,15 +26,6 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     # FileUtils.cp_r(spec_sys_dir, tmp_dir)
-    puts "!" * 80
-    puts "Files in #{spec_sys_dir}:"
-    puts system("cd #{spec_sys_dir}; pwd; ls -lR")
-    puts "!" * 80
-    # puts "Copying to ..."
-    # puts "+" * 80
-    # puts "Files in #{tmp_dir}:"
-    # puts system("cd #{tmp_dir}; pwd; ls -lR")
-    # puts "+" * 80
     FileUtils.cp(cfg_template, cfg_file)
     File.open(cfg_file, 'a') do |f|
       cfg_line = <<-EOS

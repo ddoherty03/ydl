@@ -144,10 +144,6 @@ RSpec.describe Ydl do
     end
 
     it 'should return a merged Hash keyed by symbols' do
-      puts "*" * 80
-      puts "Files in #{Ydl.config[:system_ydl_dir]}:"
-      puts Dir.glob('**/*', base: Ydl.config[:system_ydl_dir]).join("\n")
-      puts "*" * 80
       expect(@hsh.class).to eq(Hash)
       expect(Ydl.data.class).to eq(Hash)
       expect(Ydl.data[:lawyers][:ded].class).to eq(LawDoc::Lawyer)

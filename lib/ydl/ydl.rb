@@ -66,7 +66,6 @@ module Ydl
   # value equal to the result of reading in the given YAML file.
   def self.load_file(name)
     key = File.basename(name, '.ydl').to_sym
-    puts "Loading to key :#{key}: #{name}"
     result = {}
     begin
       result[key] = Psych.load_file(name, {})
@@ -208,19 +207,11 @@ module Ydl
     cfg_file = ENV['YDL_CONFIG_FILE'] || CONFIG_FILE
     cfg_file = File.expand_path(cfg_file)
     Ydl.config ||= {}
-    unless @@config_printed
-      puts "Reading config file: #{cfg_file}:"
-      puts "#{File.read(cfg_file)}\n"
-    end
     Ydl.config = YAML.load_file(cfg_file) if File.exist?(cfg_file)
     Ydl.config.deep_symbolize_keys!
     Ydl.config[:class_map] ||= {}
     Ydl.config[:class_init] ||= {}
     Ydl.config[:system_ydl_dir] ||= SYSTEM_DIR
-    unless @@config_printed
-      puts "Config hash: #{Ydl.config}"
-      @@config_printed = true
-    end
     Ydl.config
   end
 end
