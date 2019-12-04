@@ -152,7 +152,7 @@ RSpec.describe Ydl do
       expect(Ydl.data.class).to eq(Hash)
       expect(Ydl.data[:lawyers][:ded].class).to eq(LawDoc::Lawyer)
       expect(Ydl.data.keys.sort)
-        .to eq(%i[cases courts judges junk lawyers persons])
+        .to eq(%i[cases constants courts judges lawyers persons])
     end
 
     it 'should resolve cross references' do
