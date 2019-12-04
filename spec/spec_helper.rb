@@ -34,8 +34,8 @@ RSpec.configure do |config|
     puts "!" * 80
     puts "Copying to ..."
     puts "+" * 80
-    puts "Files in #{tmp_sys_ydl_dir}:"
-    puts system("cd #{tmp_sys_ydl_dir}; pwd; ls -lR")
+    puts "Files in #{tmp_dir}:"
+    puts system("cd #{tmp_dir}; pwd; ls -lR")
     puts "+" * 80
     FileUtils.cp_r(spec_home_dir, tmp_dir)
     cfg_file = File.join(tmp_user_home, '.ydl', 'config.yaml')
