@@ -39,6 +39,7 @@ system_ydl_dir: #{tmp_sys_ydl_dir}
       f.write(cfg_line)
     end
     ENV['HOME'] = tmp_user_home
+    ENV['YDL_CONFIG_FILE'] = cfg_file
     Dir.chdir(tmp_project_dir)
   end
 
