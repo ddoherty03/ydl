@@ -64,6 +64,7 @@ module Ydl
   # value equal to the result of reading in the given YAML file.
   def self.load_file(name)
     key = File.basename(name, '.ydl').to_sym
+    puts "Loading to key :#{key}: #{name}"
     result = {}
     begin
       result[key] = Psych.load_file(name, {})
