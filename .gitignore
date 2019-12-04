@@ -19,3 +19,4 @@ examples/*.ind
 examples/*.pdf
 examples/_region_*
 /examples/brief.out
+.local/
