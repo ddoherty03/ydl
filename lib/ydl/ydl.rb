@@ -12,6 +12,8 @@ module Ydl
   SYSTEM_DIR = '/usr/local/share/ydl'.freeze
   CONFIG_FILE = '~/.ydl/config.yaml'.freeze
 
+  @@config_printed = false
+
   class << self
     # Configuration hash for Ydl, read from ~/.ydl/config.yaml on require.
     attr_accessor :config
@@ -206,14 +208,19 @@ module Ydl
     cfg_file = ENV['YDL_CONFIG_FILE'] || CONFIG_FILE
     cfg_file = File.expand_path(cfg_file)
     Ydl.config ||= {}
-    puts "Reading config file: #{cfg_file}:"
-    puts "#{File.read(cfg_file)}\n"
+    unless @@config_printed
+      puts "Reading config file: #{cfg_file}:"
+      puts "#{File.read(cfg_file)}\n"
+    end
     Ydl.config = YAML.load_file(cfg_file) if File.exist?(cfg_file)
     Ydl.config.deep_symbolize_keys!
     Ydl.config[:class_map] ||= {}
     Ydl.config[:class_init] ||= {}
     Ydl.config[:system_ydl_dir] ||= SYSTEM_DIR
-    puts "Config hash: #{Ydl.config}"
+    unless @@config_printed
+      puts "Config hash: #{Ydl.config}"
+      @@config_printed = true
+    end
     Ydl.config
   end
 end
