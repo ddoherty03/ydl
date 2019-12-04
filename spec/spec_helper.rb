@@ -30,12 +30,12 @@ RSpec.configure do |config|
     FileUtils.cp_r(spec_sys_dir, tmp_dir)
     puts "!" * 80
     puts "Files in #{spec_sys_dir}:"
-    puts Dir.glob('**/*', base: tmp_sys_ydl_dir).join("\n")
+    puts system("cd #{spec_sys_dir}; pwd; ls -lR")
     puts "!" * 80
     puts "Copying to ..."
     puts "+" * 80
     puts "Files in #{tmp_sys_ydl_dir}:"
-    puts Dir.glob('**/*', base: tmp_sys_ydl_dir).join("\n")
+    puts system("cd #{tmp_sys_ydl_dir}; pwd; ls -lR")
     puts "+" * 80
     FileUtils.cp_r(spec_home_dir, tmp_dir)
     cfg_file = File.join(tmp_user_home, '.ydl', 'config.yaml')
