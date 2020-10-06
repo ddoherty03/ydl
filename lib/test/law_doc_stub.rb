@@ -41,7 +41,7 @@ module LawDoc
       when Address, NilClass
         @address = addr
       when Hash
-        @address = Address.new(addr)
+        @address = Address.new(**addr)
       else
         msg = "cannot initialize #{field} with #{addr.class.name}"
         raise ArgumentError, msg
@@ -61,7 +61,7 @@ module LawDoc
     end
 
     def self.from_hash(hsh)
-      Person.new(hsh)
+      Person.new(**hsh)
     end
 
     def to_h
@@ -106,14 +106,14 @@ module LawDoc
         if other[:person].is_a?(Person)
           person_params = other[:person].to_h
           other.delete(:person)
-          super(other.merge(person_params))
+          super(**other.merge(person_params))
         elsif other[:person].is_a?(Hash)
           person_params = other[:person]
           other.delete(:person)
-          super(other.merge(person_params))
+          super(**other.merge(person_params))
         end
       else
-        super(other)
+        super(**other)
       end
       @role = role
       case lawyers
@@ -147,7 +147,7 @@ module LawDoc
                    esig: nil,
                    sig: nil,
                    **other)
-      super(other)
+      super(**other)
       @bar_numbers = bar_numbers
       @esig = esig
       @sig = sig
@@ -160,7 +160,7 @@ module LawDoc
     def initialize(initials: nil,
                    title: nil,
                    **other)
-      super(other)
+      super(**other)
       @initials = initials
       @title = title
     end
@@ -169,7 +169,7 @@ module LawDoc
   class Court < Person
     def initialize(**other)
       other[:sex] = 'entity'
-      super(other)
+      super(**other)
     end
   end
 

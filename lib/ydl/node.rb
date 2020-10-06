@@ -192,9 +192,9 @@ module Ydl
       return val if instantiated?
 
       if val
-        klass.send(konstructor, val)
+        klass.send(konstructor, **val)
       elsif resolved?
-        klass.send(konstructor, to_params)
+        klass.send(konstructor, **to_params)
       end
     rescue ArgumentError
       nil

@@ -68,7 +68,7 @@ module Ydl
     key = File.basename(name, '.ydl').to_sym
     result = {}
     begin
-      result[key] = Psych.load_file(name, {})
+      result[key] = Psych.load_file(name)
     rescue Psych::SyntaxError => e
       usr_msg = "#{File.expand_path(name)}: #{e.problem} #{e.context} at line #{e.line} column #{e.column}"
       raise UserError, usr_msg
