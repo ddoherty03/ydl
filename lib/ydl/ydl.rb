@@ -125,17 +125,7 @@ module Ydl
     ignores = [ignores] unless ignores.is_a?(Array)
     return names if ignores.empty?
 
-    result = names
-    ignores.each do |ign|
-      names.each do |nm|
-        base = File.basename(nm, '.ydl')
-        match = false
-        match ||= ign.match(base) if ign.is_a?(Regexp)
-        match ||= (ign == base) if ign.is_a?(String)
-        result.delete(nm) if match
-      end
-    end
-    result
+    names.reject { |n| ignores.any? { |ig| File.basename(n).match(ig) } }
   end
 
   mattr_accessor :class_for_cache
