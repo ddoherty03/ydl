@@ -77,7 +77,7 @@ module Ydl
     end
 
     def self.path_to_xref(path)
-      'ydl:/' + path.map(&:to_s).join('/')
+      "ydl:/#{path.map(&:to_s).join('/')}"
     end
   end
 end

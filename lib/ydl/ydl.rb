@@ -58,7 +58,7 @@ module Ydl
       data
     end
   rescue UserError, CircularReference, BadXRef => e
-    $stderr.puts e
+    warn e
     exit 1
   end
 

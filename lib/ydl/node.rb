@@ -69,7 +69,7 @@ module Ydl
       if @referee
         ref_path = Tree.xref_to_path(@referee)
         obj = this_tree.node_at_path(ref_path)
-        if obj.val.class == klass
+        if obj.val.instance_of?(klass)
           @val = obj.val
           @resolved = true
         end
@@ -91,7 +91,7 @@ module Ydl
       children.each_pair do |k, child|
         k = make_arr ? k.to_s.to_i : k
         result[k] =
-          if child.children.empty? || child.val.class == child.klass
+          if child.children.empty? || child.val.instance_of?(klass)
             child.val
           else
             child.to_params
@@ -101,11 +101,11 @@ module Ydl
     end
 
     def instantiated?
-      return true if val.class == klass
+      return true if val.instance_of?(klass)
 
       result = false
       unless children.empty?
-        result = children.values.all? { |n| n.val.class == n.klass }
+        result = children.values.all? { |n| n.val.instance_of?(klass) }
       end
       result
     end
@@ -179,9 +179,7 @@ module Ydl
         @children = {}
         @referee = nil
       end
-      unless @depends_on.empty?
-        Tree.workq.add_dependency(Tree.path_to_xref(path), @depends_on)
-      end
+      Tree.workq.add_dependency(Tree.path_to_xref(path), @depends_on) unless @depends_on.empty?
       self
     end
 
