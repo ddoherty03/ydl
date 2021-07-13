@@ -10,7 +10,7 @@ module Ydl
   using ArrayRefinements
 
   SYSTEM_DIR = '/usr/local/share/ydl'.freeze
-  CONFIG_FILE = '~/.ydl/config.yaml'.freeze
+  CONFIG_FILE = File.join(ENV['HOME'], '.ydl/config.yaml')
 
   @@config_printed = false
 
