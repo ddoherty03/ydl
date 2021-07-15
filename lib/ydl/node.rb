@@ -107,9 +107,8 @@ module Ydl
           # warn "#{k} class #{child_klass}:"
           children[k] = child.build_subtree
         end
-        self.val = nil
-        # Finally, reify this Node by instantiating it.
-        self.val = instantiate unless instantiated?
+        # Finally, instantiate this Node
+        self.val = instantiate
         self.resolved = true
       when Array
         self.resolved = true
@@ -123,7 +122,6 @@ module Ydl
         self.val = nil
       when String
         if val.xref?
-          # warn "reify xref: #{val}"
           depends_on(val)
           self.resolved = false
         else
@@ -176,16 +174,16 @@ module Ydl
 
     # Do a depth-first instantiation of this node's children, then this node.
     def instantiate_subtree
-      children.values.each do |child|
+      children.each_value do |child|
         next if child.instantiated?
 
-        if child.children.empty?
-          child.val = child.instantiate
-        else
-          child.val = child.instantiate_subtree
-        end
+        child.val =
+          if child.children.empty?
+            child.instantiate
+          else
+            child.instantiate_subtree
+          end
       end
-      # binding.pry if $stop && path.last == :erickson
       self.val = instantiate
     end
 

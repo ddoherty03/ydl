@@ -14,7 +14,6 @@ module Ydl
     # parts of this tree, or of other trees that my not even exist at the time
     # this one is being built.
     def initialize(hsh)
-      $stop = false
       @tree_id = object_id
       @root = Node.new([], hsh, tree_id: @tree_id)
       # A Queue of unresolved Nodes as a Hash keyed by the path to the dependent
@@ -27,9 +26,9 @@ module Ydl
 
       # Replace xrefs with reified nodes that they point to
       resolve_xrefs
+
       # Instantiate nodes that could not be instantiated before the
       # cross-references were resolved.
-      $stop = true
       instantiate
     end
 
@@ -48,7 +47,6 @@ module Ydl
     # method.  That will enumerate each xref that was either pointing to
     # another node or was pointed to by another node in the order that
     # eliminates any forward references to xrefs later in the list.
-
 
     # Attempt to resolve all the xrefs inserted into the given q, a
     # Ydl::TopQueue object.

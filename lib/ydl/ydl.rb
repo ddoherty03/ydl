@@ -67,8 +67,7 @@ module Ydl
     # object, we need to convert the Tree back into a hash, but only down to
     # the level above the reified ruby objects.  By this time, all the ruby
     # objects will have been instantiated and all cross-references resolved.
-    tree_hash = tree.to_hash
-    self.data = data.merge(tree_hash)
+    self.data = data.merge(tree.to_hash)
 
     # Just return the base name's branch if base is set
     base = base.to_sym
@@ -210,8 +209,8 @@ module Ydl
     all_classes ||=
       ObjectSpace.each_object(Class)
         .map(&:to_s)
-        .select { |klass| klass =~ /^[A-Z]/ }
-        .reject { |klass| klass =~ /^Errno::/ }
+        .select { |klass| klass =~ %r{^[A-Z]} }
+        .reject { |klass| klass =~ %r{^Errno::} }
 
     suffix = key.to_s.singularize.camelize
     modules = modules.split(',').map(&:clean) if modules.is_a?(String)
