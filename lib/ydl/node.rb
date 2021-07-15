@@ -96,17 +96,16 @@ module Ydl
     # Node and @val is set to nil, or (4) an Array, in which case its elements
     # become the children of this Node (with their numeric indices as keys)
     # and @val is set nil.
-    def reify
+    def build_subtree
       case val
       when Hash
-        # warn "Hash for class #{klass}" if klass
-        # warn "reify Hash keys: #{val.keys.join('|')}"
-        # Reify children first
+        warn "Build from Hash for class '#{klass}': #{val.keys.join('|')}"
+        # Build child subtrees first
         val.each_pair do |k, v|
           child_klass = Ydl.class_for(k) || klass
           child = Node.new(path + [k], v, child_klass, tree_id: tree_id)
           # warn "#{k} class #{child_klass}:"
-          children[k] = child.reify
+          children[k] = child.build_subtree
         end
         self.val = nil
         # Finally, reify this Node by instantiating it.
@@ -117,7 +116,7 @@ module Ydl
         child_klass = Ydl.class_for(path.last) || klass
         val.each_with_index do |v, k|
           child = Node.new(path + [k.to_s.to_sym], v, child_klass, tree_id: tree_id)
-          children[k.to_s.to_sym] = child.reify
+          children[k.to_s.to_sym] = child.build_subtree
           self.resolved &&= child.resolved?
         end
         self.klass = nil

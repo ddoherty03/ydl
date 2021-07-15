@@ -23,7 +23,8 @@ module Ydl
 
       # Depth-first recursive instantiation of root node, adding unresolved
       # cross reference paths.
-      @root.reify
+      @root.build_subtree
+
       # Replace xrefs with reified nodes that they point to
       resolve_xrefs
       # Instantiate nodes that could not be instantiated before the
