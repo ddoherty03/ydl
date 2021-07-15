@@ -55,9 +55,8 @@ module Ydl
       our_tree.workq.add_dependency(path, foreign)
     end
 
-    # Convert this Node's children, other than atomic values or instantiated
-    # ruby objects, to a Hash.
-    def to_hash
+    # Convert this Node's children to a Hash or Array.
+    def to_params
       return {} if children.empty?
 
       make_arr = children.keys.map(&:to_s).all? { |k| k =~ /\A[0-9]+\z/ }
@@ -69,10 +68,10 @@ module Ydl
           if child.children.empty? || child.instantiated?
             child.val
           else
-            child.to_hash
+            child.to_params
           end
       rescue TypeError
-        warn "Child: #{path}; #{child.val}; klass: #{klass}"
+        warn "ydl: cannot convert #{path} with value '#{child.val}' to params"
       end
       result
     end
@@ -147,16 +146,17 @@ module Ydl
     # Return an object of class @klass if one can be initialized with the Hash
     # val or the current Node converted to a params hash.
     def instantiate
-      # binding.pry if $stop && path.last == :erickson
       return nil if klass.blank?
       return val if instantiated?
 
-      warn "Instantiating #{path} to #{klass}"
-      if val
-        klass.send(konstructor, **val)
-      elsif resolved?
-        klass.send(konstructor, **to_hash)
-      end
+      result =
+        if val
+          klass.send(konstructor, **val)
+        elsif resolved?
+          klass.send(konstructor, **to_params)
+        end
+      warn "Instantiated #{path} to #{klass}" if result
+      result
     rescue ArgumentError
       nil
     end

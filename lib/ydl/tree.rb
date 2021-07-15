@@ -33,7 +33,7 @@ module Ydl
     end
 
     def to_hash
-      @root.to_hash
+      @root.to_params
     end
 
     # Resolution.  Note: a 'xref' means a string of the form
