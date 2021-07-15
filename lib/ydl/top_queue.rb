@@ -9,14 +9,15 @@ module Ydl
     end
 
     def add_dependency(dependent, depends_on)
-      @dependencies[dependent] ||= []
-      @dependencies[dependent] +=
+      depends_on =
         case depends_on
         when Array
           depends_on
         else
           [depends_on]
         end
+      @dependencies[dependent] ||= []
+      @dependencies[dependent] += depends_on
       # Add an empty dependency for all the depends_on members; the TSort
       # module expects this to indicate that the ref depends on nothing else.
       depends_on.each do |ref|
@@ -25,8 +26,16 @@ module Ydl
       self
     end
 
-    def tsort
-      @dependencies.tsort
+    def replacements
+      result = {}
+      @dependencies.tsort.each do |item|
+        case item
+        when Array
+          # This is the thing that needs replacing
+          result[item] = @dependencies[item].first
+        end
+      end
+      result
     end
   end
 end

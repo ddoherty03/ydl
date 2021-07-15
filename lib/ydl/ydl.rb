@@ -38,17 +38,37 @@ module Ydl
   #
   # @param [Hash] options selectively ignore files; use alternative config
   # @return [Hash] data read from .ydl files as a Hash
-  def self.load(base = '*', ignore: nil)
+  def self.load(base = '*', ignore: nil, verbose: true)
     Ydl.read_config
-    # Load each file in order to self.data
+    # Load each file in order to self.data.  Note that there may be many files
+    # with the same basename and, hence, will be merged into the same
+    # top-level hash key with the later files overriding the earlier ones.
+    # Thus, it is important that ydl_files returns the file names starting
+    # with those having the lowest priority and ending with those having the
+    # highest.
     yaml = {}
     file_names = ydl_files(glob: base, ignore: ignore)
+    warn "ydl: files found:" if verbose
     file_names.each do |fn|
-      yaml = yaml.deep_merge(Ydl.load_file(fn))
+      file_hash = Ydl.load_file(fn)
+      yaml = yaml.deep_merge(file_hash)
     end
 
-    tree = Tree.new(yaml).to_params
-    self.data = data.merge(tree)
+    # At this point, all of the files are incorporated into a single hash with
+    # the top-level keys corresponding to the basenames of the files read in,
+    # but all of the leaf nodes are simple ruby objects, not yet instantiated
+    # into application-level objects.  That is what the Ydl::Tree class is
+    # designed to accomplish, including resolving any cross-reference strings
+    # of the form 'ydl:/path/to/other/part/of/ydl/tree'.  It does this by
+    # constructing a Ydl::Tree from the yaml hash.
+    tree = Tree.new(yaml)
+
+    # After the leaf nodes of the tree have been instantiated by the Tree
+    # object, we need to convert the Tree back into a hash, but only down to
+    # the level above the reified ruby objects.  By this time, all the ruby
+    # objects will have been instantiated and all cross-references resolved.
+    tree_hash = tree.to_hash
+    self.data = data.merge(tree_hash)
 
     # Just return the base name's branch if base is set
     base = base.to_sym
@@ -62,13 +82,28 @@ module Ydl
     exit 1
   end
 
-  # Return a Hash with a single key of the basename of the given file and a
-  # value equal to the result of reading in the given YAML file.
-  def self.load_file(name)
+  # Return a Hash of a Hash with a single top-level key of the basename of the
+  # given file and a value equal to the result of reading in the given YAML
+  # file.  The single top-level hash key will determine the class into which
+  # each of the elements of the inner Hash will be instantiated.  For example,
+  # reading the file "persons.ydl" might result in a Hash of
+  #
+  # result[:person] = {jsmith: {first: 'John', middle: 'A.', last: 'Smith',
+  # address: {street1: '123 Main', city: 'Middleton', state: 'KS', zip:
+  # '66213'}, sex: 'male'}, fordmotor: {name: 'Ford Motor Company, Inc.'},
+  # sex: 'entity', ...}
+  #
+  # Thus, each of jsmith and fordmotor will eventually get instantiated into a
+  # Person object using the hash to initialize it.  Some of the keys in that
+  # hash, e.g., :address, might themselves represent classes to be initialized
+  # with their sub-hashes, and so forth recursively.
+
+  def self.load_file(name, verbose: true)
     key = File.basename(name, '.ydl').to_sym
+    warn "ydl: loading file #{name}..." if verbose
     result = {}
     begin
-      result[key] = Psych.load_file(name)
+      result[key] = Psych.safe_load_file(name, permitted_classes: [Date, DateTime])
     rescue Psych::SyntaxError => e
       usr_msg = "#{File.expand_path(name)}: #{e.problem} #{e.context} at line #{e.line} column #{e.column}"
       raise UserError, usr_msg
@@ -89,8 +124,10 @@ module Ydl
   # priority, ignoring those whose basenames match the ignore parameter, which
   # can be a String, a Regexp, or an Array of either (all of which are matched
   # against the basename without the .ydl extension).
-  def self.ydl_files(glob: '*', ignore: nil)
+  def self.ydl_files(glob: '*', ignore: nil, verbose: true)
     read_config
+    warn "ydl: gathering ydl files #{glob}.ydl..." if verbose
+    warn "ydl: ignoring files #{ignore}.ydl..." if verbose && ignore
     sys_ydl_dir = Ydl.config[:system_ydl_dir] || '/etc/ydl'
     file_names = []
     unless sys_ydl_dir.blank?
@@ -114,6 +151,7 @@ module Ydl
 
     # Filter out any files whose base name matches options[:ignore]
     file_names = filter_ignores(file_names, ignore) unless ignore.blank?
+    file_names.each { |f| warn "  ->reading #{f}" } if verbose
     file_names
   end
 
