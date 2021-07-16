@@ -49,7 +49,7 @@ system_ydl_dir: #{spec_sys_dir}
 
   config.before(:each) do
     $save_err = $stderr
-    $err_output = StringIO.new
+    $err_output = File.open(File.join(__dir__, 'error.out'), 'w+')
     $stderr = $err_output
   end
 end
