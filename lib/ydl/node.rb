@@ -107,9 +107,14 @@ module Ydl
           # warn "#{k} class #{child_klass}:"
           children[k] = child.build_subtree
         end
-        # Finally, instantiate this Node
-        self.val = instantiate
-        self.resolved = true
+        # Finally, instantiate this Node only if its completely resolved.
+        if resolved?
+          self.val = instantiate
+          self.resolved = true
+        else
+          self.val = nil
+          self.resolved = false
+        end
       when Array
         self.resolved = true
         child_klass = Ydl.class_for(path.last) || klass
