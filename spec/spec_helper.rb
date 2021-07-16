@@ -46,4 +46,10 @@ system_ydl_dir: #{spec_sys_dir}
     ENV['HOME'] = begin_home
     Dir.chdir(begin_cwd)
   end
+
+  config.before(:each) do
+    $save_err = $stderr
+    $err_output = StringIO.new
+    $stderr = $err_output
+  end
 end
