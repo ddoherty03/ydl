@@ -19,17 +19,14 @@ module Ydl
       # A Queue of unresolved Nodes as a Hash keyed by the path to the dependent
       # nodes with a value of the nodes on which that node depends.
       @workq = Ydl::TopQueue.new
-
-      # Depth-first recursive instantiation of root node, adding unresolved
+      # Depth-first recursive build and instantiation of root node
       # cross reference paths.
       @root.build_subtree
-
-      # Replace xrefs with reified nodes that they point to
-      resolve_xrefs
-
-      # Instantiate nodes that could not be instantiated before the
-      # cross-references were resolved.
       instantiate
+    end
+
+    def inspect
+      "Tree<#{object_id}> with top-level keys: #{@root.children.keys.join(', ')}"
     end
 
     def to_hash
@@ -42,29 +39,19 @@ module Ydl
     # :object], which can correspond to an xref and vice-versa.  A 'node'
     # means a ruby reference to the object instatiated at some path.
 
-    # All the cross-reference dependencies have been recorded on the @workq,
-    # which records the dependencies and, using TSort via its TopQueue#tsort
-    # method.  That will enumerate each xref that was either pointing to
-    # another node or was pointed to by another node in the order that
-    # eliminates any forward references to xrefs later in the list.
-
-    # Attempt to resolve all the xrefs inserted into the given q, a
-    # Ydl::TopQueue object.
-    def resolve_xrefs
-      workq.replacements.each_pair do |from_path, to_xref|
-        from_node = node_at_path(from_path)
-        to_node = node_at_path(xref_to_path(to_xref))
-        from_node.val = to_node.val
-        from_node.resolved = true
-      end
-      self
-    rescue TSort::Cyclic => e
-      raise Ydl::CircularReference, e.to_s
-    end
-
     # Instantiate nodes in the tree that can be instantiated but are not
     def instantiate
-      root.instantiate_subtree
+      workq.topological_xrefs.each do |xref|
+        node = node_at_xref(xref)
+        if node.val.instance_of?(String) && node.val.xref?
+          node.val = node_at_xref(node.val).val
+          node.resolved = true
+        else
+          node.instantiate_subtree
+        end
+      end
+      @root.instantiate_subtree
+      self
     end
 
     # Return the Ydl::Node at path in Ydl.data or nil if there is no node at
@@ -86,9 +73,14 @@ module Ydl
       node
     end
 
+    # Return the Node referenced by the given xref string
+    def node_at_xref(xref)
+      node_at_path(Tree.xref_to_path(xref))
+    end
+
     # Return an Array of symbols representing a the path described by a ydl xref
     # string. Return nil if str is not an xref string.
-    def xref_to_path(xref)
+    def self.xref_to_path(xref)
       match = xref.to_s.clean.match(%r{\Aydl:/(?<path_str>.*)\z})
       return nil unless match
 

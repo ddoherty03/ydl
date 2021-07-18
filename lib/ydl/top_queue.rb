@@ -26,16 +26,15 @@ module Ydl
       self
     end
 
-    def replacements
-      result = {}
-      @dependencies.tsort.each do |item|
-        case item
-        when Array
-          # This is the thing that needs replacing
-          result[item] = @dependencies[item].first
-        end
-      end
-      result
+    def print_out
+      puts 'Dependencies:'
+      pp @dependencies.tsort
+    end
+
+    def topological_xrefs
+      @dependencies.tsort
+    rescue TSort::Cyclic => e
+      raise Ydl::CircularReference, e.to_s
     end
   end
 end

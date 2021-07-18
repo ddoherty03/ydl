@@ -34,11 +34,34 @@ module Ydl
     # Query whether this node is resolved, that is, does it contain a string
     # reference to another part of the tree to which this Node belongs.
     def resolved?
-      if children.empty?
-        resolved
-      else
-        children.values.all?(&:resolved?)
+      result = true
+      children.each_value do |v|
+        result &&=
+          case v
+          when String
+            !v.xref?
+          when Hash
+            v.resolved?
+          when Array
+            v.all?(&:resolved?)
+          else
+            true
+          end
       end
+      result
+    end
+
+    # Return an Array of the
+    def prerequisites
+      result = []
+      if children.size.positive?
+        children.each_value do |child|
+          result += child.prerequisites
+        end
+      elsif val.instance_of?(String)
+        result << val if val.xref?
+      end
+      result.flatten
     end
 
     # Return the /val/ of child at key +key+ or nil if there is none
@@ -49,10 +72,16 @@ module Ydl
       children[key]
     end
 
+    # Return the xref for this Node.
+    def xref
+      Tree.path_to_xref(path)
+    end
+
     # Record a dependency of this Node on a foreign Node by virtue of a
-    # cross-reference to the foreign Node.
+    # cross-reference to the foreign Node.  The argument foreign can be a
+    # string in the form of a Node xref or an array of xrefs.
     def depends_on(foreign)
-      our_tree.workq.add_dependency(path, foreign)
+      our_tree.workq.add_dependency(xref, foreign) unless foreign.empty?
     end
 
     # Convert this Node's children to a Hash or Array.
@@ -104,17 +133,11 @@ module Ydl
         val.each_pair do |k, v|
           child_klass = Ydl.class_for(k) || klass
           child = Node.new(path + [k], v, child_klass, tree_id: tree_id)
-          # warn "#{k} class #{child_klass}:"
           children[k] = child.build_subtree
         end
-        # Finally, instantiate this Node only if its completely resolved.
-        if resolved?
-          self.val = instantiate
-          self.resolved = true
-        else
-          self.val = nil
-          self.resolved = false
-        end
+        # Note cross-reference dependencies for this Node
+        depends_on(prerequisites)
+        self.val = nil
       when Array
         self.resolved = true
         child_klass = Ydl.class_for(path.last) || klass
@@ -123,6 +146,7 @@ module Ydl
           children[k.to_s.to_sym] = child.build_subtree
           self.resolved &&= child.resolved?
         end
+        depends_on(prerequisites)
         self.klass = nil
         self.val = nil
       when String
@@ -152,13 +176,14 @@ module Ydl
       return val if instantiated?
 
       result =
-        if val
+        if val.instance_of?(Hash)
           klass.send(konstructor, **val)
+
         elsif resolved?
           klass.send(konstructor, **to_params)
         end
       warn "Instantiated #{path} to #{klass}" if result
-      result
+      self.val = result
     rescue ArgumentError
       nil
     end
@@ -166,16 +191,6 @@ module Ydl
     def instantiated?
       klass && val.instance_of?(klass)
     end
-
-    # def instantiated?
-    #   return true if val.instance_of?(klass)
-
-    #   result = false
-    #   unless children.empty?
-    #     result = children.values.all? { |n| n.val.instance_of?(klass) }
-    #   end
-    #   result
-    # end
 
     # Do a depth-first instantiation of this node's children, then this node.
     def instantiate_subtree
