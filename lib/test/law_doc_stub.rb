@@ -73,6 +73,8 @@ module LawDoc
   end
 
   class Address
+    attr_reader :street, :city, :state, :zip, :country
+
     def initialize(
           street: nil,
           city: nil,
@@ -93,6 +95,8 @@ module LawDoc
   end
 
   class Phone
+    attr_reader :area, :exchange, :station
+
     def initialize(str)
       @phone = str
     end
