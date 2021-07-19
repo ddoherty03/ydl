@@ -2,7 +2,7 @@ module Ydl
   # A Node in a Ydl::Tree
   class Node
     attr_reader :path, :tree_id
-    attr_accessor :val, :resolved, :klass, :children
+    attr_accessor :val, :klass, :children
 
     def initialize(path, val, klass = nil, tree_id:)
       # The path is an array of symbols representing the series of references
@@ -21,34 +21,12 @@ module Ydl
       # symbols, such a :'1', :'88', etc, where an sequential array-like
       # structure is wanted.
       @children = {}
-      # # Has this Node resolved any cross-references in val yet?
-      @resolved = false
     end
 
     # Return a reference to the Ydl::Tree to which this Node belongs, in case we
     # instantiate more than one tree.
     def our_tree
       ObjectSpace._id2ref(tree_id)
-    end
-
-    # Query whether this node is resolved, that is, does it contain a string
-    # reference to another part of the tree to which this Node belongs.
-    def resolved?
-      result = true
-      children.each_value do |v|
-        result &&=
-          case v
-          when String
-            !v.xref?
-          when Hash
-            v.resolved?
-          when Array
-            v.all?(&:resolved?)
-          else
-            true
-          end
-      end
-      result
     end
 
     # Return an Array of the
@@ -149,13 +127,10 @@ module Ydl
         depends_on(prerequisites)
         self.val = nil
       when Array
-        self.resolved = true
-        # child_klass = Ydl.class_for(path.last) || klass
         child_klass = Ydl.class_for(path.last) unless path.empty?
         val.each_with_index do |v, k|
           child = Node.new(path + [k.to_s.to_sym], v, child_klass, tree_id: tree_id)
           children[k.to_s.to_sym] = child.build_subtree
-          self.resolved &&= child.resolved?
         end
         depends_on(prerequisites)
         self.klass = nil
@@ -163,17 +138,12 @@ module Ydl
       when String
         if val.xref?
           depends_on(val)
-          self.resolved = false
         else
-          # warn "reify string: #{val}"
-          self.resolved = true
           self.klass = String
         end
         self.children = {}
       else
         # E.g., Numeric, Date, DateTime
-        # warn "reify #{val.class}: #{val}"
-        self.resolved = true
         self.children = {}
         self.klass = val.class
       end
@@ -189,8 +159,7 @@ module Ydl
       result =
         if val.instance_of?(Hash)
           klass.send(konstructor, **val)
-
-        elsif resolved?
+        else
           klass.send(konstructor, **to_params)
         end
       warn "Instantiated #{path} to #{klass}" if result

@@ -45,7 +45,6 @@ module Ydl
         node = node_at_xref(xref)
         if node.val.instance_of?(String) && node.val.xref?
           node.val = node_at_xref(node.val).val
-          node.resolved = true
         else
           node.instantiate_subtree
         end
