@@ -84,25 +84,17 @@ module Ydl
     end
 
     # Recursively build the subtree of Nodes starting at this Node and set
-    #  this node's instance variables. Attempt to instantiate the node's val
-    #  into an object of type klass if possible; record cross-references in
-    #  Ydl::Tree.workq for later resolution.
+    # this node's instance variables.
     #
-    # This Node's val is either (1) a String (not a cross-reference) or a Date
-    # (or a Numeric? or a Boolean?) that is the direct value of the Node, in
-    # which case, @children must be empty and the Node is considered
-    # "resolved", or (2) a String that is a cross reference, in which case it
-    # needs to be resolved and the Node at the path up to the penultimate
-    # component becomes a "prerequisite" to resolving this Node; if its
-    # prerequisites are resolved, set @val to that Node and set this Node to
-    # resolved; otherwise, place this Node on a queue of unresolved Nodes that
-    # need to be re-visited after the prerequisite is resolved; once the
-    # cross-reference is resolved, @val become a reference to the other object
-    # in the tree and this Node is marked resolved and removed from the queue,
-    # or (3) a Hash in which case its elements become the children of this
-    # Node and @val is set to nil, or (4) an Array, in which case its elements
-    # become the children of this Node (with their numeric indices as keys)
-    # and @val is set nil.
+    # This Node's val is either (1) a String (not a cross-reference), (2) a
+    # String that is a cross reference, in which case we need to record its
+    # dependence on the referenced node in the Tree.workq, (3) a Hash in which
+    # case its elements become the children of this Node and should have their
+    # klass set to the class corresponding to this Node's last path key if
+    # it's a registered class, or (4) an Array, in which case its elements
+    # become the children of this Node converted into a Hash (with their
+    # numeric indices as keys) and its children have their klass set as with a
+    # Hash.
     def build_subtree
       case val
       when Hash
