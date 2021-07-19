@@ -161,7 +161,7 @@ RSpec.describe Ydl do
                   judges: 'LawDoc::Judge', lawyers: 'LawDoc::Lawyer',
                   persons: 'LawDoc::Person' }
       klasses.each_pair do |sym, kls|
-        Ydl[sym].each_pair do |_nm, obj|
+        Ydl[sym].each_value do |obj|
           expect(obj.class.name).to eq(kls)
         end
       end
@@ -169,6 +169,11 @@ RSpec.describe Ydl do
 
     it 'should allow access through []' do
       expect(Ydl[:lawyers].class).to eq(Hash)
+      expect(Ydl[:lawyers][:ded].class).to eq(LawDoc::Lawyer)
+      expect(Ydl[:lawyers][:ded].address.class).to eq(LawDoc::Address)
+      ad = Ydl[:cases][:erickson].parties.first.lawyers.first.address
+      expect(ad.class).to eq(LawDoc::Address)
+      expect(ad.city).to eq('Overland Park')
     end
   end
 end
