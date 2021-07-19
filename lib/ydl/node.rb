@@ -131,16 +131,27 @@ module Ydl
         warn "Build from Hash for class '#{klass}': #{val.keys.join('|')}"
         # Build child subtrees first
         val.each_pair do |k, v|
-          child_klass = Ydl.class_for(k) || klass
+          # If this node names a registered class, its /children/ should be
+          # instantiated into that class, but this node itself should not be.
+          # E.g., if this node's path ends in :persons, then it is a container
+          # for the class Person, and its children should be instantiated into
+          # that class, but not the container itself.  This node may also
+          # simply represent a parameter for a class above it, e.g., :name,
+          # for a Person class.  We set the klass of the child to nil if it is
+          # either a container node or a parameter node, but we set it to the
+          # class if it is to be instantiated.
+          child_klass = Ydl.class_for(path.last) unless path.empty?
           child = Node.new(path + [k], v, child_klass, tree_id: tree_id)
+          # Depth-first recursion on building the Tree.
           children[k] = child.build_subtree
         end
-        # Note cross-reference dependencies for this Node
+        # Record the cross-reference dependencies for this Node
         depends_on(prerequisites)
         self.val = nil
       when Array
         self.resolved = true
-        child_klass = Ydl.class_for(path.last) || klass
+        # child_klass = Ydl.class_for(path.last) || klass
+        child_klass = Ydl.class_for(path.last) unless path.empty?
         val.each_with_index do |v, k|
           child = Node.new(path + [k.to_s.to_sym], v, child_klass, tree_id: tree_id)
           children[k.to_s.to_sym] = child.build_subtree
@@ -184,8 +195,6 @@ module Ydl
         end
       warn "Instantiated #{path} to #{klass}" if result
       self.val = result
-    rescue ArgumentError
-      nil
     end
 
     def instantiated?
