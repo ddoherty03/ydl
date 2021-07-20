@@ -39,14 +39,16 @@ module Ydl
     # :object], which can correspond to an xref and vice-versa.  A 'node'
     # means a ruby reference to the object instatiated at some path.
 
-    # Instantiate nodes in the tree that can be instantiated but are not
+    # Instantiate nodes in the tree in the order of any cross-references,
+    # topologically sorted.  That is, instantiate those on which others depend
+    # first, and those dependent on earlier nodes last.
     def instantiate
-      workq.topological_xrefs.each do |xref|
-        node = node_at_xref(xref)
+      workq.topological_xrefs.each do |ref|
+        node = node_at_xref(ref)
         if node.val.instance_of?(String) && node.val.xref?
           node.val = node_at_xref(node.val).val
         else
-          node.instantiate_subtree
+          node.instantiate
         end
       end
       @root.instantiate_subtree
