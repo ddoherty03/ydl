@@ -148,6 +148,7 @@ module Ydl
       return nil if klass.blank?
       return val if instantiated?
 
+      warn "Instantiating #{path} to #{klass} ..."
       result =
         if val.instance_of?(Hash)
           klass.send(konstructor, **val)
