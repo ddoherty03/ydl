@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    ydl (0.2.03)
+    ydl (0.2.04)
       activesupport
       fat_core
       psych
@@ -25,6 +25,10 @@ GEM
       damerau-levenshtein
     i18n (1.8.10)
       concurrent-ruby (~> 1.0)
+    law_doc (0.1.12)
+      activesupport
+      fat_core
+      ydl
     method_source (1.0.0)
     minitest (5.14.4)
     pry (0.13.1)
@@ -60,7 +64,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  law_doc
+  law_doc (>= 0.1.12)
   pry
   pry-byebug
   pry-doc
