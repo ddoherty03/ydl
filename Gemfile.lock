@@ -60,6 +60,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  law_doc
   pry
   pry-byebug
   pry-doc

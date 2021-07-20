@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Ydl do
   before :all do
-    require 'test/law_doc_stub'
+    require 'law_doc'
   end
 
   describe 'load ydl_file with errors' do
