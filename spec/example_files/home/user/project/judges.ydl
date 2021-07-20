@@ -13,3 +13,15 @@ kbf:
     city: New York
     state: NY
     zip: '10007-1320'
+
+vokins:
+  name: Daniel W. Vokins
+  title: District Court Judge
+  initials: DWV
+  address:
+    street: '100 N. Kansas Ave'
+    city: 'Olathe'
+    state: 'KS'
+    zip: '66061'
+  phone: 913-715-3356
+  email: DCC-Chapter61@jocogov.org

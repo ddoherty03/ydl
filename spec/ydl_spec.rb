@@ -98,13 +98,13 @@ RSpec.describe Ydl do
       expect(@people.class).to eq(Hash)
       expect(@people[:revive].class).to eq(LawDoc::Person)
       expect(@people.keys.sort)
-        .to eq(%i[erickson mdg morgan revive zmeac zmpef1 zmpef2])
+        .to eq(%i[erickson mainstreet mdg morgan revive tdoherty zmeac zmpef1 zmpef2])
 
       expect(@lawyers.class).to eq(Hash)
       expect(@lawyers.class).to eq(Hash)
       expect(@lawyers[:ded].class).to eq(LawDoc::Lawyer)
       expect(@lawyers.keys.sort)
-        .to eq(%i[cjh dclarke ded jclarke mcrisp rjones tfarrell])
+        .to eq(%i[cjh dclarke ded jclarke mcrisp pittenger rjones tfarrell])
     end
 
     it 'should resolve cross references' do
@@ -165,6 +165,11 @@ RSpec.describe Ydl do
           expect(obj.class.name).to eq(kls)
         end
       end
+    end
+
+    it 'should include court in mainstreet case' do
+      mainstreet = Ydl[:cases][:mainstreet]
+      expect(mainstreet.court.state).to eq('KS')
     end
 
     it 'should allow access through []' do

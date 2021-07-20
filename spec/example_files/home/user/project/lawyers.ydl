@@ -38,3 +38,15 @@ cjh:
     NY: "DD-2145"
   esig: /s/ Charles J. Hyland
   sig: "\\CJHSig"
+
+pittenger:
+  name: Brandon T. Pittenger
+  address:
+    street:
+      - 6900 College Blvd., Suite 325
+    city: Overland Park
+    state: KS
+    zip: 66211
+  phone: (913) 323-4595
+  fax: (913) 661-1747
+  email: pittengerlawgroup@pittengerlawgroup.com

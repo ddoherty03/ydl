@@ -41,3 +41,19 @@ erickson:
       lawyers:
         - ydl:/lawyers/dclarke
         - ydl:/lawyers/jclarke
+
+mainstreet:
+  court: ydl:/courts/jocolimited
+  number: 21LA04135
+  judge: ydl:/judges/vokins
+  parties:
+    -
+      person: ydl:/persons/tdoherty
+      role: Defendant
+      lawyers:
+        - ydl:/lawyers/ded
+    -
+      person: ydl:/persons/mainstreet
+      role: Plaintiff
+      lawyers:
+        - ydl:/lawyers/pittenger

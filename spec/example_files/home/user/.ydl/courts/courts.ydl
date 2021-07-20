@@ -1,0 +1,28 @@
+sdny:
+  name: United States District Court for the Southern District of New York
+  address:
+    street: '40 Centre Street'
+    city: 'New York'
+    state: 'NY'
+    zip: '10007--1581'
+  division: 'Centre Street'
+  state: 'NY'
+
+dco:
+  name: 'United States District Court for the District of Colorado'
+  address:
+    street: '901 19th Street, Room A105'
+    city: 'Denver'
+    state: 'CO'
+    zip: '80294-3589'
+  state: 'CO'
+
+jocolimited:
+  name: 'District Court for Johnson County, Kansas'
+  address:
+    street: '100 N. Kansas Ave'
+    city: 'Olathe'
+    state: 'KS'
+    zip: '66061'
+  division: '61, Room 222'
+  state: 'KS'
