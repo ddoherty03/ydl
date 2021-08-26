@@ -99,7 +99,7 @@ module Ydl
       child_klass = Ydl.class_for(path.last) unless path.empty?
       case val
       when Hash
-        warn "Build from Hash for class '#{klass}': #{val.keys.join('|')}"
+        warn "Build from Hash for class '#{child_klass}': #{val.keys.join('|')}" if child_klass
         # Build child subtrees first
         val.each_pair do |k, v|
           # If this node names a registered class, its /children/ should be
@@ -119,6 +119,7 @@ module Ydl
         depends_on(prerequisites)
         self.val = nil
       when Array
+        warn "Build from Array for class '#{child_klass}'" if child_klass
         val.each_with_index do |v, k|
           child = Node.new(path + [k.to_s.to_sym], v, child_klass, tree_id: tree_id)
           children[k.to_s.to_sym] = child.build_subtree
@@ -128,6 +129,7 @@ module Ydl
         self.val = nil
       when String
         if val.xref?
+          warn "Noted cross-reference to '#{xref}'"
           depends_on(val)
         else
           self.klass = String
