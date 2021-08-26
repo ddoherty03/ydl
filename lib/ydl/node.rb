@@ -96,6 +96,7 @@ module Ydl
     # numeric indices as keys) and its children have their klass set as with a
     # Hash.
     def build_subtree
+      child_klass = Ydl.class_for(path.last) unless path.empty?
       case val
       when Hash
         warn "Build from Hash for class '#{klass}': #{val.keys.join('|')}"
@@ -110,7 +111,6 @@ module Ydl
           # for a Person class.  We set the klass of the child to nil if it is
           # either a container node or a parameter node, but we set it to the
           # class if it is to be instantiated.
-          child_klass = Ydl.class_for(path.last) unless path.empty?
           child = Node.new(path + [k], v, child_klass, tree_id: tree_id)
           # Depth-first recursion on building the Tree.
           children[k] = child.build_subtree
@@ -119,7 +119,6 @@ module Ydl
         depends_on(prerequisites)
         self.val = nil
       when Array
-        child_klass = Ydl.class_for(path.last) unless path.empty?
         val.each_with_index do |v, k|
           child = Node.new(path + [k.to_s.to_sym], v, child_klass, tree_id: tree_id)
           children[k.to_s.to_sym] = child.build_subtree
