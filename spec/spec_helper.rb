@@ -47,9 +47,9 @@ system_ydl_dir: #{spec_sys_dir}
     Dir.chdir(begin_cwd)
   end
 
-  config.before(:each) do
-    $save_err = $stderr
-    $err_output = File.open(File.join(__dir__, 'error.out'), 'w+')
-    $stderr = $err_output
+  config.before(:suite) do
+    @save_err = $stderr
+    @err = File.new(File.join(__dir__, 'error.out'), 'w', textmode: true)
+    $stderr = @err
   end
 end
