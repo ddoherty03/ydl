@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    ydl (0.2.05)
+    ydl (0.2.06)
       activesupport (~> 6.0)
       fat_core
       psych
